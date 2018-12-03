@@ -5,3 +5,5 @@ webpack.config.js
 .git
 light-webhook*
 package
+examples
+.github
