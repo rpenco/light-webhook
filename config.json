@@ -1,0 +1,24 @@
+[
+  {
+    "webclient1": {
+      "subscribe": [
+        {
+          "service": "github",
+          "name": "hub"
+        }
+      ],
+      "publish": [
+        {
+          "service": "bash",
+          "name": "ls-dir",
+          "settings": {
+            "cmd": [
+              "ls",
+              "-l"
+            ]
+          }
+        }
+      ]
+    }
+  }
+]
