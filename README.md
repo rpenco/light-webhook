@@ -2,11 +2,15 @@
 
 Simple webhook client. **Implementation in progress !**
 
+## Usage
 
-## Example
+```bash
+npm i -g light-webhook
 
+light-webhook --config=./config.json --port=8080
+```
 
-Create a configuration file.
+Create a configuration file `config.json`.
 
 ```json
 [
@@ -22,9 +26,9 @@ Create a configuration file.
       "publish": [
         {
           "service": "bash",
-          "description": "Update my local repo",
+          "description": "Execute my local script",
           "settings": {
-            "cmd": [ "git", "pull"]
+            "cmd": [ "/home/me/myscript.sh"]
           }
         }
       ]
@@ -33,9 +37,42 @@ Create a configuration file.
 ]
 ```
 
-And configure a github webhook to point to `http://example.com/webclient1/mygithub`
+And configure a github webhook to point to `http://example.com:8080/webclient1/mygithub`
+
+## Configuration
+
+### Generic structure
+
+```json5
+[
+    {
+      "unique-name": { // an unique name for each webhook
+                           
+       subscribe: [   // hook providers
+           {
+             "service": "", // service to use
+             "name": "", // choose an unique name
+             "description": "", // optional comment with a description
+             "settings": {}, // specific service settings
+           }
+       ],
+       publish: [ // actions to execute
+         {
+           "service": "", // service to use
+           "name": "", // choose an unique name
+           "description": "", // optional comment with a description
+           "settings": {}, // specific service settings
+         }
+       ]
+     }
+    }
+]
+```
+
 
 ## Subscriptions
+
+(Soon) available services:
 
 ### Github
 
@@ -68,6 +105,7 @@ And configure a github webhook to point to `http://example.com/webclient1/mygith
 ```
 
 ## Publications
+
 
 ### Bash 
 
