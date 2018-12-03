@@ -1,24 +1,26 @@
-[
-  {
-    "webclient1": {
-      "subscribe": [
-        {
-          "service": "github",
-          "name": "hub"
+{
+  "webclient1": {
+    "subscribe": [
+      {
+        "service": "github",
+        "name": "hub",
+        "settings":{
+          "events": ["*"],
+          "secret": "toto"
         }
-      ],
-      "publish": [
-        {
-          "service": "bash",
-          "name": "ls-dir",
-          "settings": {
-            "cmd": [
-              "ls",
-              "-l"
-            ]
-          }
+      }
+    ],
+    "publish": [
+      {
+        "service": "bash",
+        "name": "ls-dir",
+        "settings": {
+          "cmd": [
+            "ls",
+            "-l"
+          ]
         }
-      ]
-    }
+      }
+    ]
   }
-]
+}

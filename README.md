@@ -2,7 +2,7 @@
 
 Simple webhook client. **Implementation in progress !**
 
-## Usage
+## Usage
 
 ```bash
 npm i -g light-webhook
@@ -39,9 +39,9 @@ Create a configuration file `config.json`.
 
 And configure a github webhook to point to `http://example.com:8080/webclient1/mygithub`
 
-## Configuration
+## Configuration
 
-### Generic structure
+### Generic structure
 
 ```json5
 [
@@ -74,7 +74,7 @@ And configure a github webhook to point to `http://example.com:8080/webclient1/m
 
 (Soon) available services:
 
-### Github
+### Github
 
 ```json
 {
@@ -84,7 +84,7 @@ And configure a github webhook to point to `http://example.com:8080/webclient1/m
 }
 ```
 
-### Gitlab
+### Gitlab
 
 ```json
 {
@@ -107,7 +107,7 @@ And configure a github webhook to point to `http://example.com:8080/webclient1/m
 ## Publications
 
 
-### Bash 
+### Bash 
 
 You can call a local bash command 
 
@@ -135,7 +135,7 @@ or call a bash script
 }
 ```
 
-### Custom HTTP 
+### Custom HTTP 
 
 You can create a other webhook.
 ```json
