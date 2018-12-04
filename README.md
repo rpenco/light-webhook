@@ -1,6 +1,12 @@
 # webhook-client
 
-Simple webhook client. **Implementation in progress !**
+Simple webhook client.  
+Receives requests from Github, Gitlab, or HTTP and executes HTTP request or Bash command.
+
+**Implementation in progress !**
+
+[![Build Status](https://travis-ci.org/rpenco/light-webhook.svg?branch=master)](https://travis-ci.org/rpenco/light-webhook)
+[![npm version](https://badge.fury.io/js/light-webhook.svg)](https://badge.fury.io/js/light-webhook)
 
 ## Usage
 
@@ -72,7 +78,7 @@ And configure a github webhook to point to `http://example.com:8080/webclient1/m
 
 ## Subscriptions
 
-(Soon) available services:
+Available services:
 
 ### Github
 
