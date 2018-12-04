@@ -22,5 +22,30 @@
         }
       }
     ]
+  },
+
+  "webhook": {
+    "subscribe": [
+      {
+        "service": "http",
+        "name": "curl-http",
+        "settings":{
+          "events": ["*"],
+          "secret": "hello"
+        }
+      }
+    ],
+    "publish": [
+      {
+        "service": "bash",
+        "name": "ls-dir",
+        "settings": {
+          "cmd": [
+            "echo",
+            "'headers: {{headers}}, body: {{body}}'"
+          ]
+        }
+      }
+    ]
   }
 }

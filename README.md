@@ -110,7 +110,7 @@ And configure a github webhook to point to `http://example.com:8080/webclient1/m
     "description": "On custom HTTP POST",
     "settings":{
      "events": ["my-event"], //["*"] all or ["my-event", "my-event2", ...]
-      "secret": "helloworld" // secret sha1 or false
+      "secret": "hello" // secret sha1 or false
     }
 }
 ```
@@ -118,6 +118,16 @@ And configure a github webhook to point to `http://example.com:8080/webclient1/m
 An header `X-Webhook-Event: my-event` must be provided to match with settings events.
 
 if `secret` is provided, an header `X-Webhook-Signature: sha1=xxxxxxxxx` must be provided where *xxxxxxxxx* is the secret cyphered.
+
+
+```bash
+curl -X POST \
+     -H 'Content-Type: application/json' \
+     -H 'X-Webhook-Event: my-event' \ 
+     -H "X-Webhook-Signature: sha1=aaf4c61ddcc5e8a2dabede0f3b482cd9aea9434d" \ 
+     -d '{"repository": "myrepo", "build": 1}' \
+     http://localhost:8080/myclient/my-custom-hook
+```
 
 ## Publications
 
