@@ -8,7 +8,7 @@ module.exports = function Emitter(client, publish, subscribe, event) {
     const emitter = emitters[service];
 
     if (emitter && typeof emitter === 'function') {
-        return emitter(client, publish, event);
+        return emitter(client, publish, subscribe, event);
     } else {
         return Promise.reject('Publish service not found')
     }

@@ -79,8 +79,12 @@ And configure a github webhook to point to `http://example.com:8080/webclient1/m
 ```json
 {
   "service": "github",
-  "name": "mygithub",
-  "description": "On a github event"
+  "name": "my-github",
+  "description": "On Github event",
+  "settings":{
+    "events": ["*"], //["*"] all or ["push", "merge_request", ...]
+    "secret": "helloworld" // secret or false
+  }
 }
 ```
 
@@ -89,8 +93,11 @@ And configure a github webhook to point to `http://example.com:8080/webclient1/m
 ```json
 {
   "service": "gitlab",
-  "name": "mygitlab",
-  "description": "On a gitlab event"
+  "name": "my-gitlab",
+  "description": "On Gitlab event",
+  "settings":{
+    "events": ["*"], //["*"] all or ["push", "tag_push", "merge_request", ...]
+  }
 }
 ```
 
@@ -99,10 +106,18 @@ And configure a github webhook to point to `http://example.com:8080/webclient1/m
 ```json
  {
     "service": "http",
-    "name": "mywebhttp",
-    "description": "On a custm HTTP POST"
+    "name": "my-custom-hook",
+    "description": "On custom HTTP POST",
+    "settings":{
+     "events": ["my-event"], //["*"] all or ["my-event", "my-event2", ...]
+      "secret": "helloworld" // secret sha1 or false
+    }
 }
 ```
+
+An header `X-Webhook-Event: my-event` must be provided to match with settings events.
+
+if `secret` is provided, an header `X-Webhook-Signature: sha1=xxxxxxxxx` must be provided where *xxxxxxxxx* is the secret cyphered.
 
 ## Publications
 
@@ -117,7 +132,7 @@ You can call a local bash command
   "name": "pull-repo",
   "description": "Call my repo",
   "settings":{
-    "cmd": ["cd", "/home/me/myrepo", "&&", "git", "pull"]
+    "cmd": ["echo", "{{headers.x-github-event}}"]
   }
 }
 ```
@@ -130,7 +145,7 @@ or call a bash script
   "name": "pull-repo-script",
   "description": "Call my repo",
   "settings":{
-    "cmd": ["/home/me/pull-my-repo.sh"]
+    "cmd": ["/home/me/{{headers.x-github-event}}-my-repo.sh"]
   }
 }
 ```

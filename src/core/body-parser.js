@@ -6,8 +6,14 @@ module.exports = function BodyParser(req, next) {
             body += req.read();
         });
         req.on('end', function () {
-            req.body = JSON.parse(body.substr(0, body.length - 'null'.length));
-            next()
+            try {
+                req.body = JSON.parse(body.substr(0, body.length - 'null'.length));
+                next()
+            } catch (e) {
+                console.error('BodyParser error', e);
+                req.body = {};
+                next()
+            }
         });
     } else {
         next()

@@ -5,7 +5,8 @@
   "main": "dist/index.js",
   "scripts": {
     "test": "mocha",
-    "build": "webpack"
+    "build": "webpack",
+    "start:dev": "node ./src/index.js --config=./config.json"
   },
   "repository": {
     "type": "git",

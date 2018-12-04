@@ -1,12 +1,12 @@
 {
-  "webclient1": {
+  "github": {
     "subscribe": [
       {
         "service": "github",
-        "name": "hub",
+        "name": "github",
         "settings":{
           "events": ["*"],
-          "secret": "toto"
+          "secret": false
         }
       }
     ],
@@ -16,8 +16,8 @@
         "name": "ls-dir",
         "settings": {
           "cmd": [
-            "ls",
-            "-l"
+            "echo",
+            "'event: {{headers.x-github-event}}, url: {{body.hook.url}}'"
           ]
         }
       }
