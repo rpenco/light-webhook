@@ -1,23 +1,18 @@
 const exec = require('child_process').exec;
 const InlineArgs = require('../../common/inlineArgs');
+const Templatizer = require('../../common/templatizer');
 
 module.exports = function BashEmitter(client, publish, subscribe, event) {
 
     return new Promise(function (resolve, reject) {
 
-        const cmd = publish.settings.cmd.map((arg) => arg).join(' ').replace(/{{.*?}}/g, (val)=> {
-            const key = val.substr(2, val.length - 4).split('.');
+        const {stringify, cmd} = publish.settings;
 
-            let t = event;
-            key.forEach((k)=> { t = t[k]; });
+        const execCmd = Templatizer(cmd.map((arg) => arg).join(' '), event, {stringify: stringify});
 
-            return t;
-        });
-        // TODO replace keyword
-
-        console.log(`[${client.name}][${publish.name}] emitter execute bash command: "${cmd}"`);
+        console.log(`[${client.name}][${publish.name}] emitter execute bash command: "${execCmd}"`);
         let code = -1;
-        const pt = exec(cmd, function (err, stdout, stderr) {
+        const pt = exec(execCmd, function (err, stdout, stderr) {
             if (err) {
                 console.log(`[${client.name}][${publish.name}] bash command error: ${InlineArgs({
                     err: err,

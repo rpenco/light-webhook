@@ -3,11 +3,11 @@ const Connector = require('../../src/connectors/receivers/github');
 
 describe('Connectors - Receivers - Github', function () {
 
-    describe('Receive an Github POST', function () {
+    xdescribe('Receive an Github POST', function () {
 
         it('should return args', function (done) {
 
-            const args = {
+            const event = {
                 body: {
                     "action": "opened",
                     "issue": {
@@ -43,13 +43,39 @@ describe('Connectors - Receivers - Github', function () {
             const subscribe = {name: 'http', settings: {secret: 'mysecret', events: ['']}};
             const client = {subscribe: [subscribe], name: 'client1'};
 
-            Connector(client, subscribe, args)
+            Connector(client, subscribe, event)
                 .then((arg) => {
-                    assert.deepEqual(arg, args);
+                    assert.deepEqual(arg, event);
                 })
                 .then(done)
                 .catch(assert.fail)
                 .catch(done)
         });
     });
+
+    describe('Github', function () {
+
+        it('should return args object ', function (done) {
+
+            const client = {service: 'github', name: 'github'},
+                subscription = {name: 'github', settings: { events: ['*']}},
+                event = {
+                    headers: {
+                        'user-agent': 'GitHub-Hookshot/1234',
+                        'x-github-delivery': '1234-1234-1234-1234',
+                        'x-github-event': 'event',
+                        'x-hub-signature': 'sha1=',
+                    }, body: {}, params: {}
+                };
+
+            Connector(client, subscription, event)
+                .then((arg) => {
+                    assert.deepEqual(arg, event);
+                })
+                .then(done)
+                .catch(assert.fail)
+                .catch(done)
+        });
+    });
+
 });

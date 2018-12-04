@@ -1,4 +1,5 @@
-var http = require('light-http');
+const http = require('light-http');
+const Templatizer = require('../../common/templatizer');
 
 /**
  *
@@ -10,23 +11,33 @@ var http = require('light-http');
  *     "headers": {"user-agent": "Mozilla/5.0 xx"}
  * }
  */
-module.exports = function connector(client, publish, args) {
+module.exports = function HTTPEmitter(client, publish, subscribe, event) {
 
     return new Promise(function (resolve, reject) {
 
         const settings = publish.settings;
         const method = settings.method.toLocaleLowerCase();
+        const opt = {stringify: !!settings.stringify};
 
-        // TODO parse url
-        const url = settings.url;
+        const url = Templatizer(settings.url, event, opt);
 
-        // TODO parse params
-        const params = settings.params;
+        let params = {};
+        if (settings.params) {
+            const keys = Object.keys(settings.params);
+            keys.forEach((key) => {
+                params[Templatizer(key, event, opt)] = Templatizer(settings.params[key], event, opt)
+            });
+        }
 
-        // TODO parse headers
-        const headers = settings.headers;
+        let headers = {};
+        if (settings.headers) {
+            const keys = Object.keys(settings.headers);
+            keys.forEach((key) => {
+                headers[Templatizer(key, event, opt)] = Templatizer(settings.headers[key], event, opt)
+            });
+        }
 
-        http[method](url, params, header, function (response) {
+        http[method](url, params, headers, function (response) {
             resolve(response)
         });
 

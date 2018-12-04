@@ -7,3 +7,7 @@ light-webhook*
 package
 examples
 .github
+*.md
+*.yml
+test
+*.json

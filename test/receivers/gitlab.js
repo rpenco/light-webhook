@@ -1,18 +1,16 @@
 const assert = require('assert');
-const Connector = require('../../src/connectors/receivers/http');
+const Connector = require('../../src/connectors/receivers/gitlab');
 
-describe('Connectors - Receivers - Http', function () {
-
-    describe('Receive an HTTP POST', function () {
+describe('Connectors - Receivers - Gitlab', function () {
+    describe('#Gitlab()', function () {
 
         it('should return args object ', function (done) {
 
-            const client = {service: 'http', name: 'http'},
-                subscription = {name: 'http', settings: { events: ['*']}},
+            const client = {service: 'gitlab', name: 'gitlab'},
+                subscription = {name: 'gitlab', settings: { events: ['*']}},
                 event = {
                     headers: {
-                        'x-webhook-event': 'event',
-                        'x-webhook-signature': 'sha1=',
+                        'x-gitlab-event': 'event'
                     }, body: {}, params: {}
                 };
 
@@ -25,4 +23,5 @@ describe('Connectors - Receivers - Http', function () {
                 .catch(done)
         });
     });
+
 });
