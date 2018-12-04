@@ -17,7 +17,7 @@ module.exports = function HTTPReceiver(client, subscription, event) {
         if (subscription.settings.secret !== false && !headers['x-webhook-signature']) {
             return reject('Webhook "x-webhook-signature" header is missing or malformed.');
         } else {
-            if (subscription.settings.secret !== false ) {
+            if (subscription.settings.secret !== undefined && subscription.settings.secret !== false ) {
                 const signature = headers['x-webhook-signature'].substr('sha1='.length);
                 const shasum = crypto.createHash('sha1').update(subscription.settings.secret).digest('hex');
 

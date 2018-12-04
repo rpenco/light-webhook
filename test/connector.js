@@ -8,12 +8,19 @@ describe('Connectors - Receivers', function () {
         it('should return args object ', function (done) {
 
             const client = {service: 'github', name: 'github'},
-                subscribe = {name: 'github'},
-                args = {};
+                subscription = {name: 'github', settings: { events: ['*']}},
+                event = {
+                    headers: {
+                        'user-agent': 'GitHub-Hookshot/1234',
+                        'x-github-delivery': '1234-1234-1234-1234',
+                        'x-github-event': 'event',
+                        'x-hub-signature': 'sha1=',
+                    }, body: {}, params: {}
+                };
 
-            Connector.receivers.github(client, subscribe, args)
+            Connector.receivers.github(client, subscription, event)
                 .then((arg) => {
-                    assert.deepEqual(arg, {});
+                    assert.deepEqual(arg, event);
                 })
                 .then(done)
                 .catch(assert.fail)
@@ -26,12 +33,16 @@ describe('Connectors - Receivers', function () {
         it('should return args object ', function (done) {
 
             const client = {service: 'gitlab', name: 'gitlab'},
-                subscribe = {name: 'gitlab'},
-                args = {};
+                subscription = {name: 'gitlab', settings: { events: ['*']}},
+                event = {
+                    headers: {
+                        'x-gitlab-event': 'event'
+                    }, body: {}, params: {}
+                };
 
-            Connector.receivers.gitlab(client, subscribe, args)
+            Connector.receivers.gitlab(client, subscription, event)
                 .then((arg) => {
-                    assert.deepEqual(arg, {});
+                    assert.deepEqual(arg, event);
                 })
                 .then(done)
                 .catch(assert.fail)
@@ -44,12 +55,17 @@ describe('Connectors - Receivers', function () {
         it('should return args object ', function (done) {
 
             const client = {service: 'http', name: 'http'},
-                subscribe = {name: 'http'},
-                args = {};
+                subscription = {name: 'http', settings: { events: ['*']}},
+                event = {
+                    headers: {
+                        'x-webhook-event': 'event',
+                        'x-webhook-signature': 'sha1=',
+                    }, body: {}, params: {}
+                };
 
-            Connector.receivers.http(client, subscribe, args)
+            Connector.receivers.http(client, subscription, event)
                 .then((arg) => {
-                    assert.deepEqual(arg, {});
+                    assert.deepEqual(arg, event);
                 })
                 .then(done)
                 .catch(assert.fail)
