@@ -1,24 +1,51 @@
-[
-  {
-    "webclient1": {
-      "subscribe": [
-        {
-          "service": "github",
-          "name": "hub"
+{
+  "github": {
+    "subscribe": [
+      {
+        "service": "github",
+        "name": "github",
+        "settings":{
+          "events": ["*"],
+          "secret": false
         }
-      ],
-      "publish": [
-        {
-          "service": "bash",
-          "name": "ls-dir",
-          "settings": {
-            "cmd": [
-              "ls",
-              "-l"
-            ]
-          }
+      }
+    ],
+    "publish": [
+      {
+        "service": "bash",
+        "name": "ls-dir",
+        "settings": {
+          "cmd": [
+            "echo",
+            "'event: {{headers.x-github-event}}, url: {{body.hook.url}}'"
+          ]
         }
-      ]
-    }
+      }
+    ]
+  },
+
+  "webhook": {
+    "subscribe": [
+      {
+        "service": "http",
+        "name": "curl-http",
+        "settings":{
+          "events": ["*"],
+          "secret": "hello"
+        }
+      }
+    ],
+    "publish": [
+      {
+        "service": "bash",
+        "name": "ls-dir",
+        "settings": {
+          "cmd": [
+            "echo",
+            "'headers: {{headers}}, body: {{body}}'"
+          ]
+        }
+      }
+    ]
   }
-]
+}

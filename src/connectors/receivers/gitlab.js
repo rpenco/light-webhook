@@ -1,9 +1,17 @@
-const InlineArgs = require('../../common/inlineArgs');
 
-module.exports = function connector(client, subscribe, args) {
-
+module.exports = function GitlabReceiver(client, subscription, event) {
     return new Promise(function (resolve, reject) {
-        console.log(`[${client.name}][${subscribe.name}] receive args ${InlineArgs(args)}`);
-        return resolve(args);
+
+        const {body, headers, params} = event;
+
+        if (!headers['x-gitlab-event']) {
+            return reject('Gitlab "x-gitlab-event" header is missing.');
+        } else {
+            if (subscription.settings.events.indexOf('*') === -1 && subscription.settings.events.indexOf(body.event_name) === -1) {
+                return reject('Gitlab "x-github-event" header is not triggered.');
+            }
+        }
+        
+        return resolve(event);
     });
 };

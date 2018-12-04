@@ -2,7 +2,7 @@
 
 Simple webhook client. **Implementation in progress !**
 
-## Usage
+## Usage
 
 ```bash
 npm i -g light-webhook
@@ -39,9 +39,9 @@ Create a configuration file `config.json`.
 
 And configure a github webhook to point to `http://example.com:8080/webclient1/mygithub`
 
-## Configuration
+## Configuration
 
-### Generic structure
+### Generic structure
 
 ```json5
 [
@@ -74,23 +74,30 @@ And configure a github webhook to point to `http://example.com:8080/webclient1/m
 
 (Soon) available services:
 
-### Github
+### Github
 
 ```json
 {
   "service": "github",
-  "name": "mygithub",
-  "description": "On a github event"
+  "name": "my-github",
+  "description": "On Github event",
+  "settings":{
+    "events": ["*"], //["*"] all or ["push", "merge_request", ...]
+    "secret": "helloworld" // secret or false
+  }
 }
 ```
 
-### Gitlab
+### Gitlab
 
 ```json
 {
   "service": "gitlab",
-  "name": "mygitlab",
-  "description": "On a gitlab event"
+  "name": "my-gitlab",
+  "description": "On Gitlab event",
+  "settings":{
+    "events": ["*"], //["*"] all or ["push", "tag_push", "merge_request", ...]
+  }
 }
 ```
 
@@ -99,15 +106,33 @@ And configure a github webhook to point to `http://example.com:8080/webclient1/m
 ```json
  {
     "service": "http",
-    "name": "mywebhttp",
-    "description": "On a custm HTTP POST"
+    "name": "my-custom-hook",
+    "description": "On custom HTTP POST",
+    "settings":{
+     "events": ["my-event"], //["*"] all or ["my-event", "my-event2", ...]
+      "secret": "hello" // secret sha1 or false
+    }
 }
+```
+
+An header `X-Webhook-Event: my-event` must be provided to match with settings events.
+
+if `secret` is provided, an header `X-Webhook-Signature: sha1=xxxxxxxxx` must be provided where *xxxxxxxxx* is the secret cyphered.
+
+
+```bash
+curl -X POST \
+     -H 'Content-Type: application/json' \
+     -H 'X-Webhook-Event: my-event' \ 
+     -H "X-Webhook-Signature: sha1=aaf4c61ddcc5e8a2dabede0f3b482cd9aea9434d" \ 
+     -d '{"repository": "myrepo", "build": 1}' \
+     http://localhost:8080/myclient/my-custom-hook
 ```
 
 ## Publications
 
 
-### Bash 
+### Bash 
 
 You can call a local bash command 
 
@@ -117,7 +142,7 @@ You can call a local bash command
   "name": "pull-repo",
   "description": "Call my repo",
   "settings":{
-    "cmd": ["cd", "/home/me/myrepo", "&&", "git", "pull"]
+    "cmd": ["echo", "{{headers.x-github-event}}"]
   }
 }
 ```
@@ -130,12 +155,12 @@ or call a bash script
   "name": "pull-repo-script",
   "description": "Call my repo",
   "settings":{
-    "cmd": ["/home/me/pull-my-repo.sh"]
+    "cmd": ["/home/me/{{headers.x-github-event}}-my-repo.sh"]
   }
 }
 ```
 
-### Custom HTTP 
+### Custom HTTP 
 
 You can create a other webhook.
 ```json
