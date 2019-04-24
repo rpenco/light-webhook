@@ -17,9 +17,9 @@ light-webhook --config=./config.json
 
 | option    | description                       |
 |-----------|-----------------------------------|
-| --config  | path to configuration file (JSON) |
-| --port    | server port. Default 8080         |
-| --help    | help!                             |
+| --config  | Path to configuration file (JSON) |
+| --port    | Server port. Default 8080         |
+| --help    | Help!                             |
 
 
 Create a configuration file `config.json`.
@@ -55,23 +55,22 @@ And configure [a github webhook](https://developer.github.com/webhooks/creating/
 
 That's all, when you `push` your changes in your git repository, `light-webhook` app is triggered and execute the `echo` bash command. 
 
-You can now execute any action (bash, http request) from any http event (Github, Gitlab, Custom Http) ! 
+You can now execute any action (bash, HTTP request) from any HTTP event (Github, Gitlab, Custom HTTP) ! 
 
 ## Configuration
 
 ### Generic structure
 
-The configuration has a generic structure. 
+The configuration has a generic pipeline structure. 
 
 - A *client* with an unique identifier which contains 
-    - a *subscribe* list of *webhook listener* called **service receiver**
-    - a *publish* list of *action to perform* called **service emitter**
+    - a *subscribe* list of webhook listener
+    - a *publish* list of action to perform 
 
 ```json
 [
     {
       "client1": {
-                           
        "subscribe": [   
            {
              "service": "", 
@@ -92,7 +91,7 @@ The configuration has a generic structure.
 ```
 
 
-## Receivers (subscribers)
+## Subscribe
 
 ### Github
 
@@ -143,7 +142,7 @@ The configuration has a generic structure.
     "service": "http",
     "name": "my-custom-hook",
     "settings":{
-     "events": ["my-event"], 
+      "events": ["my-event"], 
       "secret": "sha1-secret"
     }
 }
@@ -170,20 +169,20 @@ curl -X POST \
      http://localhost:8080/myclient/my-custom-hook
 ```
 
-## Emitters (publishers)
+## Publish
 
 ### Variables
 
-You can use **variables** from your *receiver* body and your *emitter* settings.
+You can use **variables** from your *subscriber* body and your *publisher* settings.
  
 Use `{{brackets}}` to identify a variable in your configuration. For exemple:
 
 
-| option        | description                       |
-|---------------|-----------------------------------|
-| {{body.}}     | Variable from *receiver body*     |
-| {{headers.}}  | Variable from *receiver headers*  |
-| {{params.}}  | Variable from *receiver query params* |
+| option        | description                            |
+|---------------|----------------------------------------|
+| {{body.}}     | Variable from *subscribe body*         |
+| {{headers.}}  | Variable from *subscribe headers*      |
+| {{params.}}   | Variable from *subscribe query params* |
 
 
 You can for example create dynamic bash command 
@@ -252,6 +251,7 @@ You can create an other webhook.
   }
 }
 ```
+
 | option        | description                       |
 |---------------|-----------------------------------|
 | service       | service used : `http`             |

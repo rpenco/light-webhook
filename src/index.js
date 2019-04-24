@@ -1,5 +1,4 @@
 const server = require('light-http-server');
-const InlineArgs = require('./common/inlineArgs');
 const Cli = require('./core/cli');
 const Client = require('./core/client');
 const Receiver = require('./core/receiver');

@@ -3,7 +3,7 @@ node_modules
 webpack.config.js
 .idea
 .git
-light-webhook*
+light-webhook*tgz
 package
 examples
 .github
