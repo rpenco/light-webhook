@@ -173,7 +173,7 @@ curl -X POST \
 
 ## Publish
 
-### Variables
+### Variables
 
 You can use **variables** from your *subscriber* body and your *publisher* settings.
  
