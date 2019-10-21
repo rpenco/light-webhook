@@ -16,7 +16,7 @@ function readConfiguration(confPath) {
     } else if (extension === '.yaml' || extension === '.yml') {
         return parseYAML(file);
     } else {
-        console.error(`[config] Failed to read configuration '${confPath}'. Invalid extension, found '${extension}' and allow only '.json' and '.yaml'`)
+        console.error(`${(new Date()).toISOString()} [config] Failed to read configuration '${confPath}'. Invalid extension, found '${extension}' and allow only '.json' and '.yaml'`)
     }
 }
 

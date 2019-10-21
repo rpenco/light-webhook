@@ -10,11 +10,11 @@ module.exports = function BashPublisher(client, publish, subscribe, event) {
 
         const execCmd = Templatizer(cmd.map((arg) => arg).join(' '), event, {stringify: stringify});
 
-        console.log(`[${client.name}][${publish.name}] emitter execute bash command: "${execCmd}"`);
+        console.log(`${(new Date()).toISOString()} [${client.name}][${publish.name}] emitter execute bash command: "${execCmd}"`);
         let code = -1;
         const pt = exec(execCmd, function (err, stdout, stderr) {
             if (err) {
-                console.log(`[${client.name}][${publish.name}] bash command error: ${InlineArgs({
+                console.log(`${(new Date()).toISOString()} [${client.name}][${publish.name}] bash command error: ${InlineArgs({
                     err: err,
                     stdout: stdout,
                     stderr: stderr,
@@ -22,7 +22,7 @@ module.exports = function BashPublisher(client, publish, subscribe, event) {
                 })}`);
                 return reject(err);
             }
-            console.log(`[${client.name}][${publish.name}] bash command resolved: ${InlineArgs({
+            console.log(`${(new Date()).toISOString()} [${client.name}][${publish.name}] bash command resolved: ${InlineArgs({
                 err: err,
                 stdout: stdout,
                 stderr: stderr,

@@ -1,8 +1,6 @@
-# Application port
+# Application port and interface
 port: 8080
-
-# Set maximum size when using http POST service
-upload_max_size: 50
+hostname: '0.0.0.0'
 
 # Pipelines
 services:
@@ -52,12 +50,15 @@ services:
       - service: http
         name: upload
         settings:
+          upload:
+            path: "/tmp"
+            limit: 5000
           events:
             - "*"
-          secret: false
+          secret: "Hello world"
     publish:
       - service: file
         name: download
         settings:
-          path: "/tmp"
-          cmd: []
+          mkdir: true
+          path: "/tmp/{{body.name}}"

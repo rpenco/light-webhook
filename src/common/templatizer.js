@@ -1,3 +1,5 @@
+const {Log} = require('./log');
+
 /**
  * Replace keywords between brackets by its value.
  *
@@ -22,10 +24,14 @@ module.exports = function Templatizer(text, objKeys, options) {
                 try {
                     tmp = stringify ? JSON.stringify(value) : value;
                 } catch (e) {
-                    tmp = undefined;
-                    console.error(`[Templatizer] failed to stringify object: ${value}`)
+                    Log.error(`[Templatizer] failed to stringify object: ${value}`);
+                    return undefined;
                 }
             } else {
+                if (value === undefined) {
+                    Log.error(`[Templatizer] failed to templating ${val}. '${k}' is undefined.`);
+                    return undefined;
+                }
                 tmp = value;
             }
         });

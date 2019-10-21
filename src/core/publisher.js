@@ -5,11 +5,12 @@ module.exports = function Publisher(client, publish, subscribe, event) {
     const {body, headers, params} = event;
     const {service, name, description, settings} = publish;
     const {publishers} = connectors;
-    const emitter = publishers[service];
+    const publisher = publishers[service];
 
-    if (emitter && typeof emitter === 'function') {
-        return emitter(client, publish, subscribe, event);
+    if (publisher && typeof publisher === 'function') {
+        return publisher(client, publish, subscribe, event);
     } else {
+        console.error(`${(new Date()).toISOString()} [${client.name} publish service "${publish.name}" not found.`);
         return Promise.reject('Publish service not found')
     }
 };

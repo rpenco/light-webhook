@@ -30,7 +30,7 @@ module.exports = function GithubSubscriber(client, subscription, event) {
                 const shasum = crypto.createHash('sha1').update(subscription.settings.secret).digest('hex');
 
                 if (shasum !== signature) {
-                    console.log(`[${client.name}][${subscription.name}] has invalid token: signature="${signature}" shasum="${shasum}"`);
+                    console.log(`${(new Date()).toISOString()} [${client.name}][${subscription.name}] has invalid token: signature="${signature}" shasum="${shasum}"`);
                     return reject('Github "x-hub-signature" header has invalid signature.');
                 }
             }

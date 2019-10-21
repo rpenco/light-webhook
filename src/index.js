@@ -3,20 +3,31 @@ const https = require('https');
 const fs = require('fs');
 const Publisher = require('./core/client');
 const Subscriber = require('./core/subscriber');
-const fileUpload = require('express-fileupload');
+const busboy = require('connect-busboy');
 const {Cli} = require("./core/cli");
+const {Log} = require("./common/log");
+const bodyParser = require('body-parser');
 
 // parse CLI arguments
-const {config, port} = Cli();
+const {config} = Cli();
 const server = express();
 
 // file upload support
-const max_size = (config.upload_max_size || 0) * 1024 * 1024;
-console.log(`[server] Upload max size ${max_size} Bytes. Set 'upload_max_size' (in MegaBytes) to change this value.`);
-server.use(fileUpload({
-    limits: {fileSize: max_size},
-}));
+const max_size = (parseInt(config.upload_max_size) || 0) * 1024 * 1024;
+Log.info(`[server] Upload max size ${max_size} Bytes. Set 'upload_max_size' (in MegaBytes) to change this value.`);
+// server.use(fileUpload({
+//     limits: {fileSize: max_size},
+// }));
 
+server.use(busboy({
+    highWaterMark: 2 * 1024 * 1024, // Set 2MiB buffer
+})); // Insert the busboy middle-ware
+
+// parse application/x-www-form-urlencoded
+server.use(bodyParser.urlencoded({ extended: false }));
+
+// parse application/json
+server.use(bodyParser.json());
 
 // create webhook for each client
 let services;
@@ -38,26 +49,27 @@ Object.keys(services).forEach((name) => {
     }
 
     // create webhook listener
-    client.subscribe.forEach((subscribe) => new Subscriber(server, client, subscribe));
+    client.subscribe.forEach((subscribe) => new Subscriber({server, client, subscribe}));
 });
 
 server.get('/', (req, res) => {
-    res.send('Hello World');
+    Log.debug('[server] /');
+    res.send('');
 });
 
 // SSL support
 if (config.security && config.security.enable === true) {
-    console.log("[server] create https server");
+    Log.debug("[server] create https server");
     https.createServer({
         key: fs.readFileSync(config.secure.key),
         cert: fs.readFileSync(config.secure.cert),
         passphrase: config.secure.passphrase
-    }, server).listen(port || config.port, () => {
-        console.log(`[server] listening on port ${port || config.port} (HTTPS)`);
+    }, server).listen((config.port || 8080), (config.hostname || '0.0.0.0'), () => {
+        Log.info(`[server] listening on https://${config.hostname || '0.0.0.0'}:${config.port || 8080}`);
     })
 } else {
-    server.listen(port || config.port || 8080, () => {
-        console.log(`[server] listening on port ${port || config.port || 8080} (HTTP)`);
+    server.listen(config.port || 8080, (config.hostname || '0.0.0.0'), () => {
+        Log.info(`[server] listening on http://${config.hostname || '0.0.0.0'}:${config.port || 8080}`);
     });
 }
 

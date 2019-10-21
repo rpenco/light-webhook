@@ -146,20 +146,23 @@ settings:
 | name            | choose an unique service name     |
 | settings        | service configuration             |
 | settings.events | Accepted events. Use `['*']` to allow all events |
-| settings.secret | Secret provided by `X-Webhook-Signature` header. Or `false` to disabled it.|
+| settings.secret | Plain text secret provided by `X-Webhook-Signature` header. Or `false` to disabled it.|
 
 An header `X-Webhook-Event: my-event` must be provided to match with settings events.
 if `secret` is provided, an header `X-Webhook-Signature: sha1=xxxxxxxxx` must be provided where *xxxxxxxxx* is the secret cyphered.
 
+Generate a signature using [sha1-online.com](http://www.sha1-online.com/):
 
 ```bash
 curl -X POST \
      -H 'Content-Type: application/json' \
      -H 'X-Webhook-Event: my-event' \ 
-     -H "X-Webhook-Signature: sha1=aaf4c61ddcc5e8a2dabede0f3b482cd9aea9434d" \ 
+     -H 'x-webhook-signature: sha1=7b502c3a1f48c8609ae212cdfb639dee39673f5e' \
      -d '{"repository": "myrepo", "build": 1}' \
      http://localhost:8080/myclient/my-custom-hook
 ```
+
+
 
 ## Publishers
 
@@ -259,21 +262,24 @@ You can upload file to a specific location.
 service: file
 name: my-upload
 settings:
+  mkdir: false
   path:
-  - "/tmp"
+  - "/tmp/{{body.name}}"
 ```
 
-| option        | description                       |
-|---------------|-----------------------------------|
-| service       | service used : `file`             |
-| name          | choose an unique service name     |
-| settings      | service configuration             |
-| settings.path | Output directory.                 |
+| option         | description                           |
+|----------------|---------------------------------------|
+| service        | service used : `file`                 |
+| name           | choose an unique service name         |
+| settings       | service configuration                 |
+| settings.mkdir | Create missing directories. (`false`) |
+| settings.path  | Output directory.                     |
 
 
 ```shell
 curl -X POST \
   http://localhost:8080/upload/my-upload \
+  --progress-bar \
   -H 'Content-Type: application/x-www-form-urlencoded' \
   -H 'content-type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW' \
   -H 'x-webhook-event: test' \
