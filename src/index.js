@@ -1,18 +1,20 @@
 const express = require('express');
 const https = require('https');
 const fs = require('fs');
-const Cli = require('./core/cli');
 const Publisher = require('./core/client');
 const Subscriber = require('./core/subscriber');
 const fileUpload = require('express-fileupload');
+const {Cli} = require("./core/cli");
 
 // parse CLI arguments
 const {config, port} = Cli();
 const server = express();
 
 // file upload support
+const max_size = (config.upload_max_size || 0) * 1024 * 1024;
+console.log(`[server] Upload max size ${max_size} Bytes. Set 'upload_max_size' (in MegaBytes) to change this value.`);
 server.use(fileUpload({
-    limits: {fileSize: 50 * 1024 * 1024},
+    limits: {fileSize: max_size},
 }));
 
 
@@ -20,9 +22,9 @@ server.use(fileUpload({
 let services;
 
 // read new configuration format
-if(config.services){
+if (config.services) {
     services = config.services;
-}else{
+} else {
     services = config;
     console.warn("DEPRECATED, please update your configuration file.")
 }
@@ -44,18 +46,18 @@ server.get('/', (req, res) => {
 });
 
 // SSL support
-if (config.secure && config.secure.enable === true) {
+if (config.security && config.security.enable === true) {
     console.log("[server] create https server");
     https.createServer({
         key: fs.readFileSync(config.secure.key),
         cert: fs.readFileSync(config.secure.cert),
         passphrase: config.secure.passphrase
-    }, server).listen(port || config.port, () => {
-        console.log(`[server] listening on port ${port || config.port} (HTTPS)`);
+    }, server).listen(port || config.port, () => {
+        console.log(`[server] listening on port ${port || config.port} (HTTPS)`);
     })
-}else{
-    server.listen(port || config.port || 8080, () => {
-        console.log(`[server] listening on port ${port || config.port || 8080}`);
+} else {
+    server.listen(port || config.port || 8080, () => {
+        console.log(`[server] listening on port ${port || config.port || 8080} (HTTP)`);
     });
 }
 

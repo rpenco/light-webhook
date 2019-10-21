@@ -1,7 +1,7 @@
 # light-webhook
 
 Light webhook client.  
-Receives requests from Github, Gitlab, or HTTP and executes HTTP request or Bash command.
+Receives requests from Github, Gitlab, or HTTP and executes HTTP request or Bash commands.
 
 [![Build Status](https://travis-ci.org/rpenco/light-webhook.svg?branch=master)](https://travis-ci.org/rpenco/light-webhook)
 [![npm version](https://badge.fury.io/js/light-webhook.svg)](https://badge.fury.io/js/light-webhook) 
@@ -14,43 +14,46 @@ Receives requests from Github, Gitlab, or HTTP and executes HTTP request or Bash
 
 npm i -g light-webhook
 
-light-webhook --config=./config.json
+light-webhook -c ./config.yaml
 ```
 
-| option    | description                       |
-|-----------|-----------------------------------|
-| --config  | Path to configuration file (JSON) |
-| --port    | Server port. Default 8080         |
-| --help    | Help!                             |
+| option    | description                               |
+|-----------|-------------------------------------------|
+| --config  | Path to configuration file (YAML or JSON) |
+| --help    | Help!                                     |
 
 
-Create a configuration file `config.json`.
+Create a configuration file `config.yaml`.
 
-```json
+```yaml
+# Application port
+port: 8080
 
-{
-  "webclient1": {
-    "subscribe": [
-          {
-            "service": "github",
-            "name": "my-github",
-            "settings":{
-              "events": ["push"],
-              "secret": "helloworld"
-            }
-          }
-      ],
-      "publish": [
-        {
-          "service": "bash",
-          "description": "Execute my local script",
-          "settings": {
-            "cmd": [ "echo", "'event: {{headers.x-github-event}}, url: {{body.hook.url}}'"]
-          }
-        }
-      ]
-    }
-}
+# HTTPS support 
+security:
+  enable: false
+  cert: ./cert.pem
+  key: ./key.pem
+  passphrase: "your passphrase"
+upload_max_size: 50
+
+# Pipelines to serve
+services:
+  webclient1:
+    subscribe:
+    - service: github
+      name: my-github
+      settings:
+        events:
+        - push
+        secret: helloworld
+    publish:
+    - service: bash
+      description: Execute my local script
+      settings:
+        cmd:
+        - echo
+        - "'event: {{headers.x-github-event}}, url: {{body.hook.url}}'"
 ```
 
 And configure [a github webhook](https://developer.github.com/webhooks/creating/) to point to `http://example.com:8080/webclient1/my-github`.  
@@ -69,89 +72,79 @@ The configuration has a generic pipeline structure.
     - a *subscribe* list of webhook listener
     - a *publish* list of action to perform 
 
-```json
-[
-    {
-      "client1": {
-       "subscribe": [   
-           {
-             "service": "", 
-             "name": "", 
-             "settings": {} 
-           }
-       ],
-       "publish": [ 
-         {
-           "service": "", 
-           "name": "", 
-           "settings": {} 
-         }
-       ]
-     }
-    }
-]
+```yaml
+# List of services (pipelines)
+services:
+  # A service (pipeline) 
+  webclient1:
+    subscribe:
+    - service: service
+      name: my-custom-subscribe-name
+      settings:
+        - # custom subscribe service settings 
+    publish:
+    - service: service
+      name: my-custom-publish-name
+      settings:
+        - # custom publish service settings
 ```
 
 ## Subscribers
 
 ### Github
 
-```json
-{
-  "service": "github",
-  "name": "my-github",
-  "settings":{
-    "events": ["push", "merge_request"],
-    "secret": "mysecret" 
-  }
-}
+```yaml
+service: github
+name: my-github
+settings:
+  events:
+  - push
+  - merge_request
+  secret: mysecret
 ```
 
-| option        | description                       |
-|---------------|-----------------------------------|
-| service       | service used : `github`           |
-| name          | choose an unique service name     |
-| settings      | service configuration             |
+| option          | description                       |
+|-----------------|-----------------------------------|
+| service         | service used : `github`           |
+| name            | choose an unique service name     |
+| settings        | service configuration             |
 | settings.events | Accepted Github events. Use `['*']` to allow all events |
 | settings.secret | Secret provided by `X-Hub-Signature` header. Or `false` to disabled it. |
 
 ### Gitlab
 
-```json
-{
-  "service": "gitlab",
-  "name": "my-gitlab",
-  "settings":{
-    "events": ["push", "merge_request"]
-  }
-}
+```yaml
+service: gitlab
+name: my-gitlab
+settings:
+  events:
+  - push
+  - merge_request
 ```
 
-| option        | description                       |
-|---------------|-----------------------------------|
-| service       | service used : `gitlab`           |
-| name          | choose an unique service name     |
-| settings      | service configuration             |
+| option          | description                       |
+|-----------------|-----------------------------------|
+| service         | service used : `gitlab`           |
+| name            | choose an unique service name     |
+| settings        | service configuration             |
 | settings.events | Accepted Gitlab events. Use `['*']` to allow all events |
 
 ### Custom HTTP POST
 
-```json
- {
-    "service": "http",
-    "name": "my-custom-hook",
-    "settings":{
-      "events": ["my-event"], 
-      "secret": "sha1-secret"
-    }
-}
+```yaml
+service: http
+name: my-custom-hook
+settings:
+  events:
+  - my-event
+  secret: sha1-secret
 ```
 
-| option        | description                       |
-|---------------|-----------------------------------|
-| service       | service used : `http`             |
-| name          | choose an unique service name     |
-| settings      | service configuration             |
+| option          | description                       |
+|-----------------|-----------------------------------|
+| service         | service used : `http`             |
+| name            | choose an unique service name     |
+| settings        | service configuration             |
 | settings.events | Accepted events. Use `['*']` to allow all events |
 | settings.secret | Secret provided by `X-Webhook-Signature` header. Or `false` to disabled it.|
 
@@ -186,14 +179,14 @@ Use `{{brackets}}` to identify a variable in your configuration. For exemple:
 
 You can for example create dynamic bash command 
 
-```json
-{
-  "service": "bash",
-  "name": "my-script",
-  "settings":{
-    "cmd": ["./my-script.sh", "{{headers.x-github-event}}" , "{{body.repository.url}}"]
-  }
-}
+```yaml
+service: bash
+name: my-script
+settings:
+  cmd:
+  - "./my-script.sh"
+  - "{{headers.x-github-event}}"
+  - "{{body.repository.url}}"
 ```
 
 Will execute my custom script: `./my-script.sh push https://github.com/rpenco/light-webhook`
@@ -202,27 +195,24 @@ Will execute my custom script: `./my-script.sh push https://github.com/rpenco/li
 
 You can call a local bash command.
 
-```json
-{
-  "service": "bash",
-  "name": "bash-cmd",
-  "settings":{
-    "cmd": ["echo", "'event: {{headers.x-github-event}}, body:{{body}}'"],
-    "stringify": true
-  }
-}
+```yaml
+service: bash
+name: bash-cmd
+settings:
+  cmd:
+  - echo
+  - "'event: {{headers.x-github-event}}, body:{{body}}'"
+  stringify: true
 ```
 
 or call a bash script
 
-```json
-{
-  "service": "bash",
-  "name": "my-script",
-  "settings":{
-    "cmd": ["/home/me/my-script.sh"]
-  }
-}
+```yaml
+service: bash
+name: my-script
+settings:
+  cmd:
+  - "/home/me/my-script.sh"
 ```
 
 | option        | description                       |
@@ -237,17 +227,17 @@ or call a bash script
 
 You can create an other webhook.
 
-```json
-{
-  "service": "http",
-  "name": "my-http-req",
-  "settings":{
-    "method": "GET",
-    "url": "http://myotherservice.com",
-    "params": {"key": "value"},
-    "headers": {"key": "value"}
-  }
-}
+```yaml
+service: http
+name: my-http-req
+settings:
+  method: GET
+  url: http://myotherservice.com
+  params:
+    key: value
+  headers:
+    key: value
+
 ```
 
 | option        | description                       |
@@ -263,16 +253,14 @@ You can create an other webhook.
 
 ### File 
 
-You can move uploaded file to a specific location.
+You can upload file to a specific location.
 
-```json
-{
-  "service": "file",
-  "name": "my_upload",
-  "settings":{
-    "path": ["/tmp"]
-  }
-}
+```yaml
+service: file
+name: my-upload
+settings:
+  path:
+  - "/tmp"
 ```
 
 | option        | description                       |
@@ -282,6 +270,16 @@ You can move uploaded file to a specific location.
 | settings      | service configuration             |
 | settings.path | Output directory.                 |
 
+
+```shell
+curl -X POST \
+  http://localhost:8080/upload/my-upload \
+  -H 'Content-Type: application/x-www-form-urlencoded' \
+  -H 'content-type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW' \
+  -H 'x-webhook-event: test' \
+  -F file=@/home/me/file.txt
+```
+
 ## HTTPS 
 
 Using OpenSSL, we will generate our key and cert. So, here’s how you could do this:
@@ -290,18 +288,14 @@ Using OpenSSL, we will generate our key and cert. So, here’s how you could do 
 openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365
 ```
 
-Edit configuration and add `secure` section:
-```shell script
-{
-    port: 8080
-    "secure": {
-      "enable": true,
-      "key": "./key.pem",
-      "cert": "./cert.pem",
-      "passphrase": "YOUR PASSPHRASE HERE"
-    },
-    services: {}
-}
+Edit configuration file and add `security` section:
+
+```yaml
+security:
+  enable: true
+  key: "./key.pem"
+  cert: "./cert.pem"
+  passphrase: YOUR PASSPHRASE HERE
 ```
 
 Then start application, open your favourite browser and visit 

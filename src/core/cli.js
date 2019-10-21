@@ -1,30 +1,15 @@
-module.exports = function () {
-    const argv = require('yargs')
-        .option('config')
-        .coerce('config', function (arg) {
-            let file = require('fs').readFileSync(arg, 'utf8');
-            file = JSON.parse(file);
-
-            return file;
-        })
-        .demandOption('config')
-        .string('config')
+const {Config} = require("./config");
+module.exports.Cli = function () {
+    return require('yargs')
+        .usage('Usage: $0 -c [configuration]')
+        .alias('c', 'config')
+        .coerce('c', Config().read)
+        .describe('c', 'Path to configuration file')
+        .demandOption(['c'])
         .completion()
-        .describe('config', 'Path to configuration file')
-
-        .option('port')
-        .number('port')
-        .describe('port', 'server port')
-        .default('port')
-
-        .help('help')
+        .help('h')
+        .alias('h', 'help')
         .detectLocale(false)
+        .epilog("MIT")
         .parse();
-
-    const config = argv.config;
-    if (!config || Object.keys(config).length === 0) {
-        console.warn('empty configuration.');
-        process.exit(1);
-    }
-    return argv;
 };

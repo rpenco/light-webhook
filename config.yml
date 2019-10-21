@@ -1,0 +1,63 @@
+# Application port
+port: 8080
+
+# Set maximum size when using http POST service
+upload_max_size: 50
+
+# Pipelines
+services:
+
+  # 1. This pipeline listen to Github webhook for all events and
+  # execute a simple "echo 'event: <github-event> <hook-url>'"
+  # service return HTTP 200 OK with {"status": "done"}
+  github:
+    subscribe:
+      - service: github
+        name: github
+        settings:
+          events:
+            - "*"
+          secret: false
+    publish:
+      - service: bash
+        name: ls-dir
+        settings:
+          cmd:
+            - echo
+            - "'event: {{headers.x-github-event}}, url: {{body.hook.url}}'"
+
+  # 2 This pipeline listen to a custom HTTP request for all events and
+  # execute a simple 'echo' command to display headers and body values.
+  webhook:
+    subscribe:
+      - service: http
+        name: curl-http
+        settings:
+          events:
+            - "*"
+          secret: false
+    publish:
+      - service: bash
+        name: ls-dir
+        settings:
+          stringify: true
+          cmd:
+            - echo
+            - "'headers: {{headers}}, body: {{body}}'"
+
+  # 3. This service provides a light HTTP file uploader.
+  # Send a HTTP POST multipart/form-data with files and it will place it at the right place
+  upload:
+    subscribe:
+      - service: http
+        name: upload
+        settings:
+          events:
+            - "*"
+          secret: false
+    publish:
+      - service: file
+        name: download
+        settings:
+          path: "/tmp"
+          cmd: []

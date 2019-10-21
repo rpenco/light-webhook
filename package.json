@@ -6,7 +6,7 @@
   "scripts": {
     "test": "mocha test/**/*.js",
     "build": "webpack",
-    "start:dev": "node ./src/index.js --config=./config.json"
+    "start:dev": "node ./src/index.js -c ./config.yml"
   },
   "repository": {
     "type": "git",
@@ -34,7 +34,9 @@
   "homepage": "https://github.com/rpenco/light-webhook#readme",
   "dependencies": {
     "express": "^4.17.1",
-    "express-fileupload": "^1.1.6-alpha.5"
+    "express-fileupload": "^1.1.6-alpha.5",
+    "light-http": "^1.4.10",
+    "yaml": "^1.7.2"
   },
   "devDependencies": {
     "copy-webpack-plugin": "^5.0.4",
