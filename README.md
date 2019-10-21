@@ -281,3 +281,32 @@ You can move uploaded file to a specific location.
 | name          | choose an unique service name     |
 | settings      | service configuration             |
 | settings.path | Output directory.                 |
+
+## HTTPS 
+
+Using OpenSSL, we will generate our key and cert. So, here’s how you could do this:
+
+```sell
+openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365
+```
+
+Edit configuration and add `secure` section:
+```shell script
+{
+    port: 8080
+    "secure": {
+      "enable": true,
+      "key": "./key.pem",
+      "cert": "./cert.pem",
+      "passphrase": "YOUR PASSPHRASE HERE"
+    },
+    services: {}
+}
+```
+
+Then start application, open your favourite browser and visit 
+[https://localhost:8080](https://localhost:8080) and you should see your service running or using cURL:
+
+```shell
+curl -k https://localhost:8080
+```

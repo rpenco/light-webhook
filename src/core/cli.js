@@ -15,7 +15,7 @@ module.exports = function () {
         .option('port')
         .number('port')
         .describe('port', 'server port')
-        .default('port', 8080)
+        .default('port')
 
         .help('help')
         .detectLocale(false)
