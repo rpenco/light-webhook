@@ -11,7 +11,7 @@ const Templatizer = require('../../common/templatizer');
  *     "headers": {"user-agent": "Mozilla/5.0 xx"}
  * }
  */
-module.exports = function HTTPEmitter(client, publish, subscribe, event) {
+module.exports = function HTTPPublisher(client, publish, subscribe, event) {
 
     return new Promise(function (resolve, reject) {
 

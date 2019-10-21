@@ -3,7 +3,7 @@ const sinon = require('sinon');
 var proxyquire = require('proxyquire');
 
 
-describe('Connectors - Emitter - Http', function () {
+describe('Connectors - Publisher - Http', function () {
 
 
     describe('Send an HTTP request', function () {
@@ -47,7 +47,7 @@ describe('Connectors - Emitter - Http', function () {
                 }
             };
 
-            const Connector = proxyquire('../../src/connectors/emitters/http', stubs);
+            const Connector = proxyquire('../../src/connectors/publishers/http', stubs);
 
             Connector(client, publish, subscribe, event)
                 .then((response) => {
@@ -82,7 +82,7 @@ describe('Connectors - Emitter - Http', function () {
                 }
             };
 
-            const Connector = proxyquire('../../src/connectors/emitters/http', stubs);
+            const Connector = proxyquire('../../src/connectors/publishers/http', stubs);
 
             Connector(client, publish, subscribe, event)
                 .then((response) => {

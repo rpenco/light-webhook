@@ -1,7 +1,7 @@
 const assert = require('assert');
-const Connector = require('../../src/connectors/emitters/bash');
+const Connector = require('../../src/connectors/publishers/bash');
 
-describe('Connectors - Emitter - Bash', function () {
+describe('Connectors - Publisher - Bash', function () {
     describe('Bash', function () {
 
         it('should execute command', function (done) {

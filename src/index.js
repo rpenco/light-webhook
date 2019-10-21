@@ -1,23 +1,31 @@
-const server = require('light-http-server');
+const express = require('express');
 const Cli = require('./core/cli');
-const Client = require('./core/client');
-const Receiver = require('./core/receiver');
+const Publisher = require('./core/client');
+const Subscriber = require('./core/subscriber');
+const fileUpload = require('express-fileupload');
 
 // parse CLI arguments
-const argv = Cli();
+const {config, port} = Cli();
+const server = express();
+
+server.use(fileUpload({
+    limits: {fileSize: 50 * 1024 * 1024},
+}));
 
 // create webhook for each client
-Object.keys(argv.config).forEach((name) => {
+Object.keys(config).forEach((name) => {
 
-    const client = new Client(name, argv.config[name]);
+    const client = new Publisher(name, config[name]);
 
     if (!client) {
         return;
     }
 
     // create webhook listener
-    client.subscribe.forEach((subscribe) => new Receiver(server, client, subscribe));
+    client.subscribe.forEach((subscribe) => new Subscriber(server, client, subscribe));
 });
 
-console.log(`server listening on port ${argv.port}`);
-server.listen(argv.port);
+
+server.listen(port, () => {
+    console.log(`[server] listening on port ${port}`);
+});

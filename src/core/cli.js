@@ -22,7 +22,7 @@ module.exports = function () {
         .parse();
 
     const config = argv.config;
-    if (!config || Object.keys(config).length == 0) {
+    if (!config || Object.keys(config).length === 0) {
         console.warn('empty configuration.');
         process.exit(1);
     }

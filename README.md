@@ -92,8 +92,7 @@ The configuration has a generic pipeline structure.
 ]
 ```
 
-
-## Subscribe
+## Subscribers
 
 ### Github
 
@@ -116,7 +115,6 @@ The configuration has a generic pipeline structure.
 | settings.events | Accepted Github events. Use `['*']` to allow all events |
 | settings.secret | Secret provided by `X-Hub-Signature` header. Or `false` to disabled it. |
 
-
 ### Gitlab
 
 ```json
@@ -135,7 +133,6 @@ The configuration has a generic pipeline structure.
 | name          | choose an unique service name     |
 | settings      | service configuration             |
 | settings.events | Accepted Gitlab events. Use `['*']` to allow all events |
-
 
 ### Custom HTTP POST
 
@@ -171,7 +168,7 @@ curl -X POST \
      http://localhost:8080/myclient/my-custom-hook
 ```
 
-## Publish
+## Publishers
 
 ### Variables
 
@@ -236,7 +233,6 @@ or call a bash script
 | settings.cmd  | Bash command to execute.          |
 | settings.stringify | If `true`, when you use a variable, if it is an object, it will be serialized. |
 
-
 ### Custom HTTP request
 
 You can create an other webhook.
@@ -264,3 +260,24 @@ You can create an other webhook.
 | settings.params    | `body` request in case of `post` or `put`.|
 | settings.headers   | request headers.|
 | settings.stringify | If `true`, when you use a variable, if it is an object, it will be serialized. |
+
+### File 
+
+You can move uploaded file to a specific location.
+
+```json
+{
+  "service": "file",
+  "name": "my_upload",
+  "settings":{
+    "path": ["/tmp"]
+  }
+}
+```
+
+| option        | description                       |
+|---------------|-----------------------------------|
+| service       | service used : `file`             |
+| name          | choose an unique service name     |
+| settings      | service configuration             |
+| settings.path | Output directory.                 |

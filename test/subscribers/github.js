@@ -1,5 +1,5 @@
 const assert = require('assert');
-const Connector = require('../../src/connectors/receivers/github');
+const Connector = require('../../src/connectors/subscribers/github');
 
 describe('Connectors - Receivers - Github', function () {
 

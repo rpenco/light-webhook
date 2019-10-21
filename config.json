@@ -31,7 +31,7 @@
         "name": "curl-http",
         "settings":{
           "events": ["*"],
-          "secret": "hello"
+          "secret": false
         }
       }
     ],
@@ -40,10 +40,34 @@
         "service": "bash",
         "name": "ls-dir",
         "settings": {
+          "stringify": true,
           "cmd": [
             "echo",
             "'headers: {{headers}}, body: {{body}}'"
           ]
+        }
+      }
+    ]
+  },
+
+  "upload": {
+    "subscribe": [
+      {
+        "service": "http",
+        "name": "upload",
+        "settings":{
+          "events": ["*"],
+          "secret": false
+        }
+      }
+    ],
+    "publish": [
+      {
+        "service": "file",
+        "name": "download",
+        "settings": {
+          "path": "/tmp",
+          "cmd": []
         }
       }
     ]

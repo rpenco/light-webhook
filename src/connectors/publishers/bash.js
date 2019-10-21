@@ -2,7 +2,7 @@ const exec = require('child_process').exec;
 const InlineArgs = require('../../common/inlineArgs');
 const Templatizer = require('../../common/templatizer');
 
-module.exports = function BashEmitter(client, publish, subscribe, event) {
+module.exports = function BashPublisher(client, publish, subscribe, event) {
 
     return new Promise(function (resolve, reject) {
 

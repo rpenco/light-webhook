@@ -1,5 +1,5 @@
 
-module.exports = function GitlabReceiver(client, subscription, event) {
+module.exports = function GitlabSubscriber(client, subscription, event) {
     return new Promise(function (resolve, reject) {
 
         const {body, headers, params} = event;

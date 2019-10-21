@@ -1,5 +1,5 @@
 const assert = require('assert');
-const Connector = require('../../src/connectors/receivers/http');
+const Connector = require('../../src/connectors/subscribers/http');
 
 describe('Connectors - Receivers - Http', function () {
 

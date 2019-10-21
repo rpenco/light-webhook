@@ -1,7 +1,7 @@
 const crypto = require('crypto');
 
 
-module.exports = function GithubReceiver(client, subscription, event) {
+module.exports = function GithubSubscriber(client, subscription, event) {
     return new Promise(function (resolve, reject) {
 
         const {body, headers, params} = event;

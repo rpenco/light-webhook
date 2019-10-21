@@ -1,5 +1,5 @@
 const assert = require('assert');
-const Connector = require('../../src/connectors/receivers/gitlab');
+const Connector = require('../../src/connectors/subscribers/gitlab');
 
 describe('Connectors - Receivers - Gitlab', function () {
     describe('#Gitlab()', function () {

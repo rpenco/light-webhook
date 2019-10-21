@@ -1,14 +1,14 @@
 const connectors = require('../connectors');
-const Emitter = require('./emitter');
+const Emitter = require('./publisher');
 const bodyParser = require('./body-parser');
 const InlineArgs = require('../common/inlineArgs');
 const querystring = require('querystring');
 
-module.exports = function Receiver(server, client, subscribe) {
+module.exports = function Subscriber(server, client, subscribe) {
 
     const {service, name, description, settings} = subscribe;
-    const {receivers} = connectors;
-    const receiver = receivers[service];
+    const {subscribers} = connectors;
+    const receiver = subscribers[service];
 
     if (!receiver || typeof receiver !== 'function') {
         return Promise.reject('Subscribe service not found !')
@@ -30,11 +30,12 @@ module.exports = function Receiver(server, client, subscribe) {
             const event = {
                 body: req.body,
                 headers: req.headers,
-                params: querystring.parse(req.url)
+                params: querystring.parse(req.url),
+                files: req.files
             };
 
 
-        console.log(`[${client.name}] webhook event: ${InlineArgs(event)}`);
+        // console.log(`[${client.name}] webhook event: ${InlineArgs(event)}`);
 
             const promise = receiver(client, subscribe, event)
                 .then(() => {
@@ -52,7 +53,7 @@ module.exports = function Receiver(server, client, subscribe) {
                         })
                 })
                 .catch((err) => {
-                    console.error(`[${client.name}] caugtch error:`, err);
+                    console.error(`[${client.name}] catch error:`, err);
                     res.send({status: 'failed', error: err.message})
                 });
         });
