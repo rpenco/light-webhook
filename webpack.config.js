@@ -1,26 +1,24 @@
 const path = require('path');
-const CopyPlugin = require('copy-webpack-plugin');
-const PermissionsOutputPlugin = require('webpack-permissions-plugin');
 
 module.exports = {
-    entry: './src/index.js',
+    entry: './src/index.ts',
+    devtool: 'inline-source-map',
     mode: 'production',
-    target: "node",
-    output: {
-        path: path.resolve(__dirname, 'dist'),
-        filename: 'index.js'
+    target: 'node',
+    module: {
+        rules: [
+            {
+                test: /\.tsx?$/,
+                use: 'ts-loader',
+                exclude: /node_modules/,
+            },
+        ],
     },
-    plugins: [
-        new CopyPlugin([
-            { from: './src/light-webhook', to: './'}
-        ]),
-        new PermissionsOutputPlugin({
-            buildFiles: [
-                {
-                    path: path.resolve(__dirname, 'dist/light-webhook'),
-                    fileMode: '777'
-                }
-            ]
-        })
-    ],
+    resolve: {
+        extensions: [ '.tsx', '.ts', '.js' ],
+    },
+    output: {
+        filename: 'bundle.js',
+        path: path.resolve(__dirname, 'dist'),
+    },
 };

@@ -73,7 +73,7 @@ The configuration has a generic pipeline structure.
     - a *publish* list of action to perform 
 
 ```yaml
-# List of services (pipelines)
+# List of services (pipeline)
 services:
   # A service (pipeline) 
   webclient1:

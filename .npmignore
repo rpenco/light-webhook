@@ -1,6 +1,6 @@
 src
 node_modules
-webpack.config.js
+webpack.config.ts
 .idea
 .git
 light-webhook*tgz
