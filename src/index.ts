@@ -11,6 +11,16 @@ try {
         .start()
         .then(r => {
             process.on('SIGINT', () => r.stop());
+            // process.on('uncaughtException', (err: any) => {
+            //     if (err.errno === 'EADDRINUSE') {
+            //         Log.error(err.message);
+            //         process.exit(1);
+            //     } else {
+            //         Log.error(`UncaughtException: ${err.message}`);
+            //         Log.debug(err);
+            //     }
+            //     process.exit(1);
+            // });
         });
 } catch (e) {
     Log.error(e.message);

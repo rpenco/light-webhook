@@ -4,12 +4,16 @@
   "description": "Simple webhook client. Receives requests from Github, Gitlab, or HTTP and executes HTTP requests or Bash commands.\n",
   "homepage": "https://github.com/rpenco/light-webhook#readme",
   "license": "SEE LICENSE IN LICENSE",
-  "main": "dist/bundle.js",
+  "main": "./dist/bundle.js",
+  "bin": {
+    "light-webhook": "./dist/bundle.js"
+  },
   "scripts": {
     "test": "mocha -r ts-node/register ./\\*\\*/\\*.spec.ts",
     "build": "webpack",
     "start:dev": "node src/index.ts -c ./examples/http/http.yaml",
-    "release:pack": "npm run build && npm pack"
+    "release:pack": "npm run build && npm pack",
+    "refresh": "rm -rf ./node_modules ./package-lock.json && npm install"
   },
   "repository": {
     "type": "git",
@@ -34,13 +38,11 @@
   "bugs": {
     "url": "https://github.com/rpenco/light-webhook/issues"
   },
-  "bin": {
-    "light-webook": "dist/bundle.js"
-  },
   "files": [
     "dist/bundle.js"
   ],
-  "dependencies": {
+  "dependencies": {},
+  "devDependencies": {
     "@hapi/joi": "^16.1.8",
     "body-parser": "^1.19.0",
     "connect-busboy": "0.0.2",
@@ -55,9 +57,7 @@
     "winston": "^3.2.1",
     "winston-syslog": "^2.3.0",
     "yaml": "^1.7.2",
-    "yargs": "^14.0.0"
-  },
-  "devDependencies": {
+    "yargs": "^14.0.0",
     "@types/body-parser": "^1.17.1",
     "@types/busboy": "^0.2.3",
     "@types/chai": "^4.2.6",
@@ -73,6 +73,8 @@
     "@types/superagent": "^4.1.4",
     "@types/winston": "^2.4.4",
     "@types/yargs": "^13.0.3",
+    "banner-plugin": "^1.0.10",
+    "banner-webpack-plugin": "^0.2.3",
     "chai": "^4.2.0",
     "compression-webpack-plugin": "^3.0.1",
     "copy-webpack-plugin": "^5.1.0",

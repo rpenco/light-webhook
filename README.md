@@ -17,10 +17,10 @@ npm i -g light-webhook --no-optional
 light-webhook -c ./config.yaml
 ```
 
-| option    | description                                      |
-|-----------|--------------------------------------------------|
-| --config  | Path to configuration file (YAML, JSON or HJSON) |
-| --help    | Help!                                            |
+| option    | description                                            |
+|-----------|--------------------------------------------------------|
+| --config  | Path to configuration file (`YAML`, `JSON` or `HJSON`) |
+| --help    | Help!                                                  |
 
 
 Basic configuration (`config.yaml`) example:
@@ -28,7 +28,13 @@ Basic configuration (`config.yaml`) example:
 ```yaml
 # Application port
 port: 8080
-
+logger:
+  level: info
+  files:
+  - filename: /var/log/combined.log
+    level: info
+  - filename: /var/log/error.log
+    level: error
 # Pipelines
 pipelines:
   - name: github_push_pipeline

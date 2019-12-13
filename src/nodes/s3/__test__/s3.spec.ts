@@ -4,7 +4,7 @@ import Joi from "@hapi/joi";
 import {Tuple} from "../../../webhook/tuple/tuple";
 import * as path from "path";
 
-describe('S3 (require active s3 backend)', () => {
+xdescribe('S3 (require active s3 backend)', () => {
 
     it('should print stringified tuple object', (done) => {
         let bashNode = new BashNode('bash_test');
