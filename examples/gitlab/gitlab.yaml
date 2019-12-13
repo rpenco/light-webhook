@@ -11,7 +11,6 @@ pipelines:
         type: bash
         settings:
           pwd: "/tmp"
-          stringify: true
           command: "echo"
           arguments:
-            - "{{input.headers.event}} {{input.body}}"
+            - "{{ stringify(options) /}}"

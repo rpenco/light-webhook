@@ -7,13 +7,11 @@ pipelines:
         type: http
         settings:
           events: ["upload_event"]
-          max_upload_size: "5G"
 
       - name: print
         type: bash
         settings:
           pwd: "/tmp"
-          stringify: true
           command: "echo"
           arguments:
-            - "{{input.headers.event}} {{input.body}}"
+            - "{{ headers['content-type'] }}"

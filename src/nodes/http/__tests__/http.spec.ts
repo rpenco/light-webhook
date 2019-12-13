@@ -20,18 +20,6 @@ describe('Http', () => {
                         signature: "kdsodznvaz234rn"
                     },
                     type: "http"
-                },
-                {
-                    name: "execute_push",
-                    settings: {
-                        arguments: [
-                            "{{headers.event}} {{body}}"
-                        ],
-                        command: "echo",
-                        pwd: "/tmp",
-                        stringify: true
-                    },
-                    type: "bash"
                 }
             ]
         };
@@ -54,10 +42,7 @@ describe('Http', () => {
 
             expect(response.status).to.be.equal(200);
             expect(response.body).to.be.eqls({
-                err: null,
-                stdout: '{{headers.event}} {{body}}\n',
-                stderr: '',
-                code: 0
+                hello: 'world'
             });
             webhook.stop();
         } catch (e) {

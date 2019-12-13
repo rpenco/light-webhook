@@ -11,3 +11,4 @@ examples
 *.yml
 test
 *.json
+*.log

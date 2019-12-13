@@ -3,8 +3,11 @@ import {Cli} from "./webhook/config/cli";
 import {Log} from "./webhook/lib/log";
 
 try {
+    const configuration = new Cli().parseArgs().getConfiguration();
+    Log.reload(configuration.logger);
+
     new Webhook()
-        .configure(new Cli().parseArgs().getConfiguration())
+        .configure(configuration)
         .start()
         .then(r => {
             process.on('SIGINT', () => r.stop());

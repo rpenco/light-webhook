@@ -18,10 +18,17 @@ export interface NodeConfiguration {
     settings: { [key: string]: any }
 }
 
+export interface LoggerConfiguration {
+    level: string;
+    files: {filename: string, level?: string}[];
+    meta?: {[key: string]: string};
+}
+
 export interface Configuration {
     port: number;
     hostname: string;
     uploadMaxSize: number;
     tls: TLSConfiguration;
+    logger: LoggerConfiguration;
     pipelines: TopologyConfiguration[];
 }

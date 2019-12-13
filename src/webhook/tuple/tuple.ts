@@ -26,6 +26,10 @@ export interface ITuple<T> {
     setFiles(files: { [k: string]: any }): ITuple<T>;
 
     getFiles(): { [k: string]: any };
+
+    setCurrentFile(file: any): ITuple<T>;
+
+    getCurrentFile(): any;
 }
 
 export class Tuple<T> implements ITuple<T> {
@@ -35,6 +39,7 @@ export class Tuple<T> implements ITuple<T> {
     private headers: { [k: string]: string } = {};
     private context: { [k: string]: string } = {};
     private files: { [k: string]: string } = {};
+    private file: {};
 
     getContext(): { [k: string]: string } {
         return this.context;
@@ -104,4 +109,13 @@ export class Tuple<T> implements ITuple<T> {
     getFiles(): { [k: string]: any } {
         return this.files;
     }
+    setCurrentFile(file: any): ITuple<T> {
+        this.file = file;
+        return this;
+    }
+
+    getCurrentFile(): any {
+        return this.file;
+    }
+
 }

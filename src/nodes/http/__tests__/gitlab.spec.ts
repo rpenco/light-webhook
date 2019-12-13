@@ -18,18 +18,6 @@ describe('Gitlab', () => {
                         token: "kdsodznvaz234rn"
                     },
                     type: "gitlab"
-                },
-                {
-                    name: "execute_push",
-                    settings: {
-                        arguments: [
-                            "{{headers.event}} {{body}}"
-                        ],
-                        command: "echo",
-                        pwd: "/tmp",
-                        stringify: true
-                    },
-                    type: "bash"
                 }
             ]
         };
@@ -49,23 +37,14 @@ describe('Gitlab', () => {
                 .send({
                     "object_kind": "push",
                     "before": "95790bf891e76fee5e1747ab589903a6a1f80f22",
-                    "after": "da1560886d4f094c3e6c9ef40349f7d38b5d27d7",
-                    "ref": "refs/heads/master",
-                    "checkout_sha": "da1560886d4f094c3e6c9ef40349f7d38b5d27d7",
-                    "user_id": 4,
-                    "user_name": "John Smith",
-                    "user_username": "jsmith",
-                    "user_email": "john@example.com",
-                    "user_avatar": "https://s.gravatar.com/avatar/d4c74594d841139328695756648b6bd6?s=8://s.gravatar.com/avatar/d4c74594d841139328695756648b6bd6?s=80",
-                    "project_id": 15
+                    "after": "da1560886d4f094c3e6c9ef40349f7d38b5d27d7"
                 });
 
             expect(response.status).to.be.equal(200);
             expect(response.body).to.be.eqls({
-                err: null,
-                stdout: '{{headers.event}} {{body}}\n',
-                stderr: '',
-                code: 0
+                object_kind: 'push',
+                before: '95790bf891e76fee5e1747ab589903a6a1f80f22',
+                after: 'da1560886d4f094c3e6c9ef40349f7d38b5d27d7'
             });
             webhook.stop();
         } catch (e) {

@@ -14,5 +14,4 @@ pipelines:
           pwd: "/tmp"
           command: "echo"
           arguments:
-            - "{{headers.event}} {{body}}"
-          stringify: true
+            - "{{ stringify(options) /}}"

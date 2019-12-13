@@ -13,7 +13,7 @@ describe('Light Webhook', () => {
                     name: "input_push",
                     settings: {
                         events: [
-                            "push"
+                            "issues"
                         ],
                         signature: "kdsodznvaz234rn"
                     },
@@ -23,11 +23,10 @@ describe('Light Webhook', () => {
                     name: "execute_push",
                     settings: {
                         arguments: [
-                            "{{headers.event}} {{body}}"
+                            "{{ headers['x-github-delivery'] }}"
                         ],
                         command: "echo",
-                        pwd: "/tmp",
-                        stringify: true
+                        pwd: "/tmp"
                     },
                     type: "bash"
                 }
@@ -49,11 +48,6 @@ describe('Light Webhook', () => {
             .set('Content-Type', 'application/json')
             .set('X-GitHub-Event', 'issues')
             .send({
-                action: "opened",
-                issue: {
-                    url: "https://api.github.com/repos/octocat/Hello-World/issues/1347",
-                    number: 1347,
-                },
                 repository: {
                     id: 1296269,
                     full_name: "octocat/Hello-World",
@@ -61,17 +55,13 @@ describe('Light Webhook', () => {
                         login: "octocat",
                         id: 1,
                     },
-                },
-                sender: {
-                    login: "octocat",
-                    id: 1,
                 }
             });
 
         expect(response.status).to.be.equal(200);
         expect(response.body).to.be.eqls({
             err: null,
-            stdout: '{{headers.event}} {{body}}\n',
+            stdout: "72d3162e-cc78-11e3-81ab-4c9367dc0958\n",
             stderr: '',
             code: 0
         });

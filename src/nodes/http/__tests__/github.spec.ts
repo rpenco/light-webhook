@@ -18,23 +18,11 @@ describe('Github', () => {
                         signature: "kdsodznvaz234rn"
                     },
                     type: "github"
-                },
-                {
-                    name: "execute_push",
-                    settings: {
-                        arguments: [
-                            "{{headers.event}} {{body}}"
-                        ],
-                        command: "echo",
-                        pwd: "/tmp",
-                        stringify: true
-                    },
-                    type: "bash"
                 }
             ]
         };
 
-        try{
+        try {
 
             const webhook = await new Webhook()
                 .configure(
@@ -54,30 +42,20 @@ describe('Github', () => {
                     issue: {
                         url: "https://api.github.com/repos/octocat/Hello-World/issues/1347",
                         number: 1347,
-                    },
-                    repository: {
-                        id: 1296269,
-                        full_name: "octocat/Hello-World",
-                        owner: {
-                            login: "octocat",
-                            id: 1,
-                        },
-                    },
-                    sender: {
-                        login: "octocat",
-                        id: 1,
                     }
                 });
 
+            console.log(response.body);
             expect(response.status).to.be.equal(200);
             expect(response.body).to.be.eqls({
-                err: null,
-                stdout: '{{headers.event}} {{body}}\n',
-                stderr: '',
-                code: 0
+                action: 'opened',
+                issue: {
+                    url: 'https://api.github.com/repos/octocat/Hello-World/issues/1347',
+                    number: 1347
+                }
             });
             webhook.stop();
-        }catch (e) {
+        } catch (e) {
             console.log(e);
             expect.fail();
         }

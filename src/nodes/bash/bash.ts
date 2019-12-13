@@ -5,6 +5,7 @@ import {fromPromise} from "rxjs/internal/observable/fromPromise";
 import {Observable, of} from "rxjs";
 import {ITuple} from "../../webhook/tuple/tuple";
 import {INode, INodeContext} from "../../webhook/node/node";
+import {Templatizer} from "../../webhook/lib/templatizer";
 
 interface Settings {
     /**
@@ -27,19 +28,6 @@ interface Settings {
      * Format: 'key="value"'
      */
     environments: string[];
-
-    /**
-     * If true, display JSON as string else try to get nested value
-     * @default false
-     * @example
-     * if obj  is { a: { b: 1}} and string is "{{a}}"
-     *
-     * if stringify === true will display:
-     *   '{"b": 1}'
-     * else if stringify === false will display:
-     *  '[object]' and you 'll need to set "{{a.b}}" to display '1'
-     */
-    stringify: boolean;
 }
 
 /**
@@ -66,20 +54,18 @@ export class BashNode implements INode {
             pwd: Joi.string(),
             command: Joi.string().required(),
             arguments: Joi.array().default([]),
-            environments: Joi.array().default([]),
-            stringify: Joi.boolean().default(false)
+            environments: Joi.array().default([])
         }).default();
     }
 
     /**
      * Called when pipeline starts (when application start).
-     * TODO for moment prepare() is only called on InputNode
      * @param conf
      * @param context
      */
     prepare(conf: Settings, context: INodeContext): Observable<ITuple<any>> {
         this.conf = conf;
-        // nothing to do. return non breaking observable..
+        Log.debug(`prepare ${this.name} node. nothing to do. return non breaking observable..`);
         return of();
     }
 
@@ -91,22 +77,27 @@ export class BashNode implements INode {
     execute(tuple: ITuple<any>): Observable<ITuple<any>> {
         Log.info(`${this.name} receive tuple id="${tuple.getId()}"`);
 
-        // const {stringify, command, arguments} = this.getSettings();
-        // const execCmd = Templatizer(arguments.map((arg) => arg).join(' '), event, {stringify: stringify});
-
         this.builder = new SubProcessBuilder()
-            .command(this.conf.command)
-            .arguments(this.conf.arguments);
+            .command(Templatizer.compile(this.conf.command, tuple))
+            .arguments(this.conf.arguments.map(arg => Templatizer.compile(arg, tuple)));
 
         if (this.conf.pwd) {
-            this.builder.pwd(this.conf.pwd)
+            this.builder.pwd(Templatizer.compile(this.conf.pwd, tuple))
         }
 
         if (this.conf.environments) {
-            this.builder.environments(this.conf.environments)
+            this.builder.environments(this.conf.environments.map(env => Templatizer.compile(env, tuple)))
         }
 
-        return fromPromise(this.builder.execute().then((data) => tuple.setData(data)));
+        return fromPromise(this.builder.execute()
+            .then(
+                data => tuple.setData(data),
+                err => {
+                    tuple.setError(new Error(`Command returns an error status code.`));
+                    tuple.setData({stdout: '', stderr: err});
+                    return Promise.reject(tuple);
+                }
+            ));
     }
 
     /**
@@ -125,6 +116,7 @@ export class BashNode implements INode {
     reject<A, B>(lastStream: ITuple<A>): Observable<ITuple<B>> {
         return of();
     }
+
     /**
      * Called when a node in the PIPELINE succeed.
      * TODO for moment resolve() is only called on InputNode

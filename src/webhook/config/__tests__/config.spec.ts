@@ -6,9 +6,14 @@ describe('Config', () => {
 
     it('should load github.yaml configuration', () => {
         const config = new Config()
-            .read(path.join(__dirname, '../../../../docs/examples', 'github.yaml'));
+            .read(path.join(__dirname, '../../../../examples/github', 'github.yaml'));
         expect(config).to.eqls({
             hostname: "127.0.0.1",
+            logger: {
+                files: [],
+                level: 'info',
+                meta: {}
+            },
             pipelines: [
                 {
                     name: "github_push_pipeline",
@@ -27,11 +32,10 @@ describe('Config', () => {
                             name: "execute_push",
                             settings: {
                                 arguments: [
-                                    "{{headers.event}} {{body}}"
+                                    "{{ stringify(options) /}}"
                                 ],
                                 command: "echo",
-                                pwd: "/tmp",
-                                stringify: true
+                                pwd: "/tmp"
                             },
                             type: "bash"
                         }
@@ -49,7 +53,7 @@ describe('Config', () => {
 
     it('should load gitlab.yaml configuration', () => {
         const config = new Config()
-            .read(path.join(__dirname, '../../../../docs/examples', 'gitlab.yaml'));
+            .read(path.join(__dirname, '../../../../examples/gitlab', 'gitlab.yaml'));
         expect(config).to.eqls({
                 port: 8081,
                 pipelines: [
@@ -71,10 +75,9 @@ describe('Config', () => {
                                 type: "bash",
                                 settings: {
                                     pwd: "/tmp",
-                                    stringify: true,
                                     command: "echo",
                                     arguments: [
-                                        "{{input.headers.event}} {{input.body}}"
+                                        "{{ stringify(options) /}}"
                                     ]
                                 }
                             }
@@ -83,6 +86,11 @@ describe('Config', () => {
                 ],
                 hostname: "127.0.0.1",
                 uploadMaxSize: 0,
+                logger: {
+                    files: [],
+                    level: 'info',
+                    meta: {}
+                },
                 tls: {
                     enable: false,
                     allowUnsigned: false
@@ -93,7 +101,7 @@ describe('Config', () => {
 
     it('should load http.yaml configuration', () => {
         const config = new Config()
-            .read(path.join(__dirname, '../../../../docs/examples', 'http.yaml'));
+            .read(path.join(__dirname, '../../../../examples/http', 'http.yaml'));
         expect(config).to.eqls({
                 port: 8081,
                 pipelines: [
@@ -106,8 +114,7 @@ describe('Config', () => {
                                 settings: {
                                     events: [
                                         "upload_event"
-                                    ],
-                                    max_upload_size: "5G"
+                                    ]
                                 }
                             },
                             {
@@ -115,10 +122,9 @@ describe('Config', () => {
                                 type: "bash",
                                 settings: {
                                     pwd: "/tmp",
-                                    stringify: true,
                                     command: "echo",
                                     arguments: [
-                                        "{{input.headers.event}} {{input.body}}"
+                                        "{{ headers['content-type'] }}"
                                     ]
                                 }
                             }
@@ -127,6 +133,11 @@ describe('Config', () => {
                 ],
                 hostname: "127.0.0.1",
                 uploadMaxSize: 0,
+                logger: {
+                    files: [],
+                    level: 'info',
+                    meta: {}
+                },
                 tls: {
                     enable: false,
                     allowUnsigned: false

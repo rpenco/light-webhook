@@ -1,28 +1,31 @@
 import * as winston from "winston";
+import {LoggerConfiguration} from "../config/configuration";
 
 class LogManager {
     logger;
 
     constructor() {
-        return this.getInstance();
+        return this.getInstance({
+            level: 'info',
+            meta: {
+                service: 'local'
+            },
+            files: [
+                {filename: 'error.log', level: 'error'},
+                {filename: 'combined.log'}
+            ]
+        });
     }
 
-    public getInstance(){
+    public getInstance(configuration: LoggerConfiguration) {
         this.logger = winston.createLogger({
-            level: 'info',
+            level: configuration.level,
             format: winston.format.combine(
                 winston.format.timestamp(),
                 winston.format.simple()
             ),
-            // defaultMeta: { service: 'user-service' },
-            transports: [
-                //
-                // - Write to all logs with level `info` and below to `combined.log`
-                // - Write all logs error (and below) to `error.log`.
-                //
-                new winston.transports.File({ filename: 'error.log', level: 'error' }),
-                new winston.transports.File({ filename: 'combined.log' })
-            ]
+            defaultMeta: configuration.meta,
+            transports: configuration.files.map(file => new winston.transports.File(file))
         });
 
         if (process.env.NODE_ENV !== 'production') {
@@ -36,14 +39,13 @@ class LogManager {
         }
         return this;
     }
+
     public debug(...args) {
         this.logger.debug(...args);
-        // Log.log('debug', ...args);
     }
 
     public warn(...args) {
         this.logger.warn(...args);
-        // Log.log('warn ', ...args);
     }
 
     public info(...args) {
@@ -53,5 +55,10 @@ class LogManager {
     public error(...args) {
         this.logger.error(...args);
     }
+
+    reload(configuration: LoggerConfiguration) {
+        this.getInstance(configuration);
+    }
 }
+
 export const Log = new LogManager();

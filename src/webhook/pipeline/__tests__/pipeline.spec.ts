@@ -1,6 +1,6 @@
 import {expect} from 'chai';
 import * as path from 'path';
-import {Pipeline} from "../pipeline";
+import {IPipelineContext, Pipeline} from "../pipeline";
 import {TopologyConfiguration} from "../../config/configuration";
 import {RegisteredNodes} from "../../../nodes/register";
 import express from "express";
@@ -25,18 +25,18 @@ describe('Pipeline', () => {
                     name: "execute_push",
                     settings: {
                         arguments: [
-                            "{{headers.event}} {{body}}"
+                            "{{ stringify(options) /}}"
                         ],
                         command: "echo",
-                        pwd: "/tmp",
-                        stringify: true
+                        pwd: "/tmp"
                     },
                     type: "bash"
                 }
             ]
         };
 
-        const pipeline = new Pipeline(configuration, RegisteredNodes, express())
+        const context: IPipelineContext = {logger: console, server: express()};
+        const pipeline = new Pipeline(configuration, RegisteredNodes, context)
             .build();
         expect(pipeline.name).to.equals('github_push_pipeline');
         expect(pipeline.nodes).to.have.lengthOf(2);
