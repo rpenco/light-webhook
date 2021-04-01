@@ -9,7 +9,7 @@
 [![Docker](https://img.shields.io/docker/pulls/rpenco/light-webhook.svg)](https://npmjs.org/package/light-webhook)
 
 > 👷 THIS VERSION IS UNDER DEVELOPMENT.  
-> Use [this version (1.0.6)](https://github.com/rpenco/light-webhook/tree/master) or help me contributing. 
+> Use [this version (1.0.6)](https://github.com/rpenco/light-webhook/tree/1.0) or help me contributing. 
 
 ## ✨ Overview
 
@@ -49,7 +49,7 @@ stream:
           args: ["--req", "{{@stringify(it)}}"]
 ```
 
-Then launch application `light-webhook -c configuration.yml`. And send Github webhook to `http://127.0.0.1:8080/github`.
+Then launch application `light-webhook -c configuration.yml` and send Github webhook to `http://127.0.0.1:8080/github`.
 Voilà, you `custom_script.sh` will be executed with arguments based on received Github request 
 
 ## 📕 Documentation
