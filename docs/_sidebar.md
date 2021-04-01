@@ -1,0 +1,32 @@
+
+* [Welcome](/ "Light-Webhook: Welcome to the light stream lib")
+    * [Getting started](getting_started.md "Light-Webhook: Getting started")
+    * [Configuration](configuration.md "Light-Webhook: Configuration")
+    * [Sources](source/index.md "Light-Webhook: Source section")
+      * [🔴 File](source/file.md "Light-Webhook: File source documentation")
+      * [🔴 Github](source/github.md "Light-Webhook: Github source documentation")
+      * [🔴 Gitlab](source/gitlab.md "Light-Webhook: Gitlab source documentation")
+      * [🟡 Http](source/http.md "Light-Webhook: Http source documentation")
+      * [🔴 Kafka](source/kafka.md "Light-Webhook: Kafka source documentation")
+      * [🔴 Syslog](source/syslog.md "Light-Webhook: Syslog source documentation")
+    
+    * [Functions](function/index.md "Light-Webhook: Function documentation")
+      * [🔴 User Defined Function](function/udf.md "Light-Webhook: User Defined Javascript Function documentation")
+      * [🔴 User Defined Node](function/udn.md "Light-Webhook: User Defined Javascript Node documentation")
+      
+    * [Sink](sink/index.md "Light-Webhook: Sink documentation")
+      * [🟢 Bash](sink/bash.md "Light-Webhook: Bash sink documentation")
+      * [🟢 Console](sink/console.md "Light-Webhook: Console sink documentation")
+      * [🔴 Elasticsearch](sink/elasticsearch.md "Light-Webhook: Elasticsearch sink documentation")
+      * [🔴 Http](sink/http.md "Light-Webhook: Http sink documentation")
+      * [🔴 Kakfa](sink/kafka.md "Light-Webhook: Kafka sink documentation")
+      * [🔴 S3](sink/s3.md "Light-Webhook: S3 sink documentation")
+
+  * [Examples](examples/index.md "Light-Webhook: Examples documentation")
+      * [Http to Bash](docs/examples/http_to_bash.md "Light-Webhook: Http to Bash example")
+      * [Github to Bash](examples/github_to_bash.md "Light-Webhook: Github to Bash example")
+      * [Gitlab to Bash](examples/gitlab_to_bash.md "Light-Webhook: Gitlab to Bash example")
+      
+  * [Deploy](deploy/index.md "Light-Webhook: Deploy your stream")
+  * [Contributing](contributing.md "Light-Webhook: Contributing")
+  * [Ideas](ideas.md "Light-Webhook: Ideas")

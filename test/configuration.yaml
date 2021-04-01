@@ -1,0 +1,44 @@
+name: simple-stream
+interval: 1000
+logger:
+    level: info
+stream:
+#    -   name: generator
+#        type: generator-source
+#        settings:
+#            message: Hello world!
+#        out:
+#            - bash
+
+#    -   name: bash
+#        type: bash-sink
+#        settings:
+#            command: ls
+#            arguments: [-l]
+#        out:
+#            - console
+
+
+    -   name: http
+        type: http-source
+        settings:
+            host: 127.0.0.1
+            port: 8080
+            method: post
+            path: /publish
+            webhook:
+                events: ['write']
+
+        out:
+            - console
+
+    -   name: console
+        type: console-sink
+        settings:
+            format: pretty-json
+            level: info
+
+
+
+
+
