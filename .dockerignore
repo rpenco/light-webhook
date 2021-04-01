@@ -1,0 +1,8 @@
+node_modules
+docs
+.ida
+.github
+src
+test
+*.tgz
+*.log

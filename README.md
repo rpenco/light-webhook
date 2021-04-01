@@ -2,8 +2,11 @@
 
 [![Build Status](https://travis-ci.org/rpenco/light-webhook.svg?branch=2.x)](https://travis-ci.org/rpenco/light-webhook)
 [![npm version](https://badge.fury.io/js/light-webhook.svg)](https://badge.fury.io/js/light-webhook)
-[![NPM](https://img.shields.io/npm/dt/light-webhook.svg)](https://npmjs.org/package/light-webhook)
 [![Package Quality](https://npm.packagequality.com/shield/light-webhook.png)](https://packagequality.com/#?package=light-webhook)
+[![NPM](https://img.shields.io/npm/dt/light-webhook.svg)](https://npmjs.org/package/light-webhook)  
+
+[![Issue open](https://img.shields.io/github/issues/rpenco/light-webhook)](https://npmjs.org/package/light-webhook)
+[![Docker](https://img.shields.io/docker/pulls/rpenco/light-webhook.svg)](https://npmjs.org/package/light-webhook)
 
 > 👷 THIS VERSION IS UNDER DEVELOPMENT.  
 > Use [this version (1.0.6)](https://github.com/rpenco/light-webhook/tree/master) or help me contributing. 
@@ -56,6 +59,7 @@ Voilà, you `custom_script.sh` will be executed with arguments based on received
 
 ## Docker 
 
+[](https://hub.docker.com/r/rpenco/light-webhook)
 You can pass your configuration using `/conf/configuration.yaml` mounted volume. 
 
 ```bash

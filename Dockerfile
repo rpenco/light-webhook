@@ -1,6 +1,8 @@
 FROM node:15-alpine
 MAINTAINER rpenco <https://github.com/rpenco/light-webhook>
 
+ENV NODE_ENV=production
+
 WORKDIR /usr/local/bin
 
 ADD dist/light-webhook .
