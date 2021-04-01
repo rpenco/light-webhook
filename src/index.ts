@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 import {Webhook} from "./lib/webhook";
 import {Cli} from "./lib/cli";
 import {Log} from "./lib/log";

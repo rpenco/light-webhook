@@ -53,6 +53,15 @@ Voilà, you `custom_script.sh` will be executed with arguments based on received
 
  - **[Read complete documentation](https://rpenco.github.io/light-webhook/)**
 
+
+## Docker 
+
+You can pass your configuration using `/conf/configuration.yaml` mounted volume. 
+
+```bash
+docker run --name light-webhook -v $(pwd)/test/configuration.yaml:/conf/configuration.yaml -p 8080:8080 rpenco/light-webhook:2
+```
+
 ## 📄 Licences
 
 MIT License

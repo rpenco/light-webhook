@@ -24,7 +24,7 @@ yarn build
 Run a [configuration](configuration.md)
 
 ```bash
-node dist/bundle.js -conf configuration.yaml
+node dist/light-webhook.js -conf configuration.yaml
 ```
 
 ## Local deployment
@@ -44,18 +44,11 @@ light-webhook -c configuration.yaml
 
 ## Docker deployment
 
-Using in memory configuration file.
+**Using volume**
 
-You can pass your configuration using `CONFIGURATION` environment variable.
-
-```bash
-$ docker run --name light-webhook -p 8080:8080 -e CONFIGURATION:@configuration.yml rpenco/light-webhook:2.0
-```
-
-Using volume configuration.
-
-You can mount your configuration volume into `/configuration` path.
+You can pass your configuration using `/conf/configuration.yaml` mounted volume.  
+For example, start container with http server listening on 8080 and with local configuration is located at `$(pwd)/test/configuration.yml`.
 
 ```bash
-$ docker run --name light-webhook -p 8080:8080 -v ./configuration:/configuration rpenco/light-webhook:2.0
+docker run --name light-webhook -v $(pwd)/test:/conf -p 8080:8080 rpenco/light-webhook:2
 ```

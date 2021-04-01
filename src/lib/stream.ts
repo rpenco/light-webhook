@@ -3,7 +3,7 @@ import {forkJoin, Observable} from "rxjs";
 import {map} from 'rxjs/operators';
 import {TypeRegistry} from "./register";
 import {INode, INodeContext, IRecord, ISinkNode, ISourceNode, NodeConfiguration, SinkNode, SourceNode} from "../api";
-import {FileSource, GithubSource, GitlabSource, HttpSource} from "../nodes/sources";
+import {FileSource, GeneratorSource, GithubSource, GitlabSource, HttpSource} from "../nodes/sources";
 import {BashSink, ConsoleSink, FileSink, HttpSink, KafkaSink, S3Sink, SyslogSink} from "../nodes/sinks";
 import {Config} from "./config";
 import {Log} from "./log";
@@ -29,6 +29,7 @@ export class Stream {
     register() {
         //register sources
         this.registry.put('file-source', FileSource);
+        this.registry.put('generator-source', GeneratorSource);
         this.registry.put('github-source', GithubSource);
         this.registry.put('gitlab-source', GitlabSource);
         this.registry.put('http-source', HttpSource);

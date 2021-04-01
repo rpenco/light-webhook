@@ -1,12 +1,12 @@
 {
   "name": "light-webhook",
-  "version": "2.0.0-alpha.0",
-  "description": "Simple webhook client. Receives requests from Github, Gitlab, or HTTP and executes HTTP requests or Bash commands.\n",
-  "homepage": "https://github.com/rpenco/light-webhook#readme",
+  "version": "2.0.0-alpha.1",
+  "description": "light-webhook is a lightweight application for receiving webhooks from different sources, processing them as streams and publishing the results in sinks.",
+  "homepage": "https://rpenco.github.io/light-webhook/#/",
   "license": "SEE LICENSE IN LICENSE",
-  "main": "./dist/bundle.js",
+  "main": "./dist/light-webhook.js",
   "bin": {
-    "light-webhook": "./dist/bundle.js"
+    "light-webhook": "./dist/light-webhook.js"
   },
   "scripts": {
     "test": "mocha -r ts-node/register 'src/**/*.spec.ts'",
@@ -28,7 +28,11 @@
     "nodejs",
     "webhook-client",
     "hook",
-    "light"
+    "light",
+    "http",
+    "kafka",
+    "bash",
+    "stream"
   ],
   "contributors": [],
   "author": {
@@ -39,10 +43,9 @@
     "url": "https://github.com/rpenco/light-webhook/issues"
   },
   "files": [
-    "dist/bundle.js"
+    "dist/light-webhook.js"
   ],
-  "dependencies": {
-  },
+  "dependencies": {},
   "devDependencies": {
     "@types/body-parser": "^1.19.0",
     "@types/busboy": "^0.2.3",
@@ -79,6 +82,7 @@
     "mocha": "^8.3.2",
     "proxyquire": "^2.1.3",
     "rxjs": "^6.6.7",
+    "shebang-loader": "^0.0.1",
     "sinon": "^10.0.0",
     "squirrelly": "^8.0.8",
     "superagent": "^6.1.0",

@@ -18,6 +18,9 @@ module.exports = {
                     ],
                 exclude: /node_modules/,
             },
+            {
+                loader: 'shebang-loader'
+            }
 
         ],
     },
@@ -25,7 +28,7 @@ module.exports = {
         extensions: ['.tsx', '.ts', '.js'],
     },
     output: {
-        filename: 'bundle.js',
+        filename: 'light-webhook',
         path: path.resolve(__dirname, 'dist'),
     },
     devServer: {

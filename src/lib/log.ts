@@ -26,17 +26,17 @@ class LogManager {
                 winston.format.simple(),
             ),
             defaultMeta: configuration.meta,
-            transports: configuration.files.map(file => new winston.transports.File(file))
+            // transports: configuration.files.map(file => new winston.transports.File(file))
         });
 
-        if (process.env.NODE_ENV !== 'production') {
+        // if (process.env.NODE_ENV !== 'production') {
             (this.logger as any).add(new winston.transports.Console({
                 format: winston.format.combine(
                     winston.format.colorize(),
                     winston.format.simple()
                 )
             }));
-        }
+        // }
         return this;
     }
 

@@ -3,22 +3,6 @@ interval: 1000
 logger:
     level: info
 stream:
-#    -   name: generator
-#        type: generator-source
-#        settings:
-#            message: Hello world!
-#        out:
-#            - bash
-
-#    -   name: bash
-#        type: bash-sink
-#        settings:
-#            command: ls
-#            arguments: [-l]
-#        out:
-#            - console
-
-
     -   name: http
         type: http-source
         settings:
@@ -28,14 +12,13 @@ stream:
             path: /publish
             webhook:
                 events: ['write']
-
         out:
             - console
 
     -   name: console
         type: console-sink
         settings:
-            format: pretty-json
+            format: json
             level: info
 
 
