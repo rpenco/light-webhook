@@ -1,8 +1,8 @@
 # Deploy
 
-> NOT IMPLEMENTED YET!
+> 🟢 STABLE | This documentation is stable.
 
-## From source
+## 🪛 Run from source
 
 Clone repository
 ```bash
@@ -18,37 +18,48 @@ yarn install
 Compile sources
 
 ```bash
-yarn build
+yarn release:pack
 ```
 
 Run a [configuration](configuration.md)
 
 ```bash
-node dist/light-webhook.js -conf configuration.yaml
+node dist/light-webhook -c test/configuration.yaml
 ```
 
-## Local deployment
+## 🪛 Run with NPM
 
-Install application
+[NPM official page](https://www.npmjs.com/package/light-webhook).
+
+Simply install package with `global` option.
 
 ```bash
-yarn add light-webhook -g
+npm install -g light-webhook@2.0.0-alpha.1
 ```
 
-Run a [configuration](configuration.md)
+Then execute your configuration.
 
 ```bash
-light-webhook -c configuration.yaml
+light-webhook -c test/configuration.yaml
 ```
 
 
-## Docker deployment
+## 🪛 Run with Docker
 
-**Using volume**
+[Docker Hub official page](https://hub.docker.com/r/rpenco/light-webhook).
 
-You can pass your configuration using `/conf/configuration.yaml` mounted volume.  
-For example, start container with http server listening on 8080 and with local configuration is located at `$(pwd)/test/configuration.yml`.
+You can pass your configuration using `/conf/configuration.yaml` mounted volume.
 
 ```bash
-docker run --name light-webhook -v $(pwd)/test:/conf -p 8080:8080 rpenco/light-webhook:2
+docker run --name light-webhook -v $(pwd)/test/configuration.yaml:/conf/configuration.yaml -p 8080:8080 rpenco/light-webhook:2.0.0-alpha.1
+```
+
+## 🪛 Run from Tarball
+
+Download source from [Github release page](https://github.com/rpenco/light-webhook/releases).
+
+```bash
+tar -xvf light-webhook-2.0.0-alpha.1.tgz
+# (optional: set executable mode) chmod +x package/dist/light-webhook.js
+./package/dist/light-webhook.js -c test/configuration.yaml
 ```

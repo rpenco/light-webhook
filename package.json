@@ -45,7 +45,9 @@
   "files": [
     "dist/light-webhook.js"
   ],
-  "dependencies": {},
+  "dependencies": {
+    "light-webhook": "^2.0.0-alpha.1"
+  },
   "devDependencies": {
     "@types/body-parser": "^1.19.0",
     "@types/busboy": "^0.2.3",

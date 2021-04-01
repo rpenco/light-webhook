@@ -29,4 +29,5 @@
       
   * [Deploy](deploy/index.md "Light-Webhook: Deploy your stream")
   * [Contributing](contributing.md "Light-Webhook: Contributing")
+  * [Migration v1.0 to v2.0](migrations/migration_1.0_2.0.md "Light-Webhook: Migration 1.0 to 2.0")
   * [Ideas](ideas.md "Light-Webhook: Ideas")
