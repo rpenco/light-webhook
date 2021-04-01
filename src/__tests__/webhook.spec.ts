@@ -1,6 +1,6 @@
 import * as superagent from "superagent";
 import {expect} from "chai";
-import {Configuration, StreamConfiguration} from "../api";
+import {Configuration} from "../api";
 import {Webhook} from "../lib/webhook";
 
 describe('Light Webhook', () => {

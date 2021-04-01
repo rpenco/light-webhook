@@ -6,9 +6,7 @@ import Joi from "joi";
 import {Observable, of, Subscriber} from "rxjs";
 import {CST} from "yaml";
 import {AnyRecord, INodeContext, Record, SourceNode} from "../../api";
-import Map = CST.Map;
 import * as http from "http";
-import {Server} from "http";
 import express, {Express} from "express";
 import {VoidRecord} from "../../api/record";
 

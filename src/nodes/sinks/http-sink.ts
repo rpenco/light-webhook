@@ -1,7 +1,6 @@
 import Joi from "joi";
-import {Observable, of, Subscriber} from "rxjs";
+import {Subscriber} from "rxjs";
 import * as superagent from "superagent";
-import {fromPromise} from "rxjs/internal/observable/fromPromise";
 import {AnyRecord, SinkNode} from "../../api";
 
 interface Settings {

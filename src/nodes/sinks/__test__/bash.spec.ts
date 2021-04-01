@@ -1,11 +1,3 @@
-import {expect} from "chai";
-import {BashSink} from "../bash-sink";
-import Joi from "joi";
-import {Log} from "../../../lib/log";
-import {AnyRecord, Record} from "../../../api";
-import {Observable} from "rxjs";
-
-
 describe('Bash', () => {
 
     // it('should print stringified record object', (done) => {

@@ -1,5 +1,5 @@
 import Joi from "joi";
-import {Observable, of, Subscriber} from "rxjs";
+import {of, Subscriber} from "rxjs";
 import {AnyRecord, SourceNode} from "../../api";
 
 interface GitlabSettings {
