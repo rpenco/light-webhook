@@ -58,6 +58,8 @@ Tuple is composed with this following object:
 - `files`: Dictionary (field:object) for each files received in the first Input node.
 - `file`: When node working on each file (e.i: S3 node), current file is available.
 
+> Templating sur powered by [SquirrellyJS](https://squirrelly.js.org/) a _Powerful, lightweight, pluggable JS template engine_.
+
 ### Examples
 
 ```shell script

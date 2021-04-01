@@ -13,6 +13,29 @@
 Receive requests from **Github**, **Gitlab**, **HTTP**, **Kafka** or **Syslog** and executes **Bash** commands or send to **Kafka**, **Syslog** or **HTTP** request
 You can read full and beautiful [documentation here](https://rpenco.github.io/light-webhook/)
 
+Features
+
+    wrench Helpers, filters
+    wrench Great error reporting
+    package 0 dependencies
+    hammer Conditionals
+    wrench Better quotes/comments support
+        ex. {{someval + "name }}" }} compiles correctly, while it fails with DoT or EJS
+    zap Exports ES Modules as well as UMD
+    hammer Loops
+    wrench Custom delimeters
+    memo Easy template syntax
+    wrench Precompilation
+    hammer Partials
+    wrench Inline JavaScript
+    hammer Comments
+    wrench Caching
+    rocket Super Fast
+        Squirrelly has been benchmarked against Marko, Pug, doT, Swig, Handlebars, Mustache, and Nunjucks. In each test, Squirrelly was fastest.
+    zap Async support: async filters, helpers, partials
+    wrench Template inheritance
+
+
 ## Licences
 
 > MIT License
