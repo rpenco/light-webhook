@@ -85,14 +85,16 @@ export class Stream {
             source.addOut(node as SinkNode<any>);
         }
 
-        nodeConf.out.forEach(outName => {
-            const outConf = this.context.nodes.find(n => n.name == outName);
-            if (outConf != null) {
-                this.handleLoop(outConf, node)
-            } else {
-                this.getLogger().error(`failed to find out node '${outName}' configured in out section of node ${nodeConf.name}`);
-            }
-        });
+        if(nodeConf.out) {
+            nodeConf.out.forEach(outName => {
+                const outConf = this.context.nodes.find(n => n.name == outName);
+                if (outConf != null) {
+                    this.handleLoop(outConf, node)
+                } else {
+                    this.getLogger().error(`failed to find out node '${outName}' configured in out section of node ${nodeConf.name}`);
+                }
+            });
+        }
         return node;
     }
 

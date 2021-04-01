@@ -71,7 +71,7 @@ export abstract class Node<Settings> implements INode<Settings> {
     private _outNodes: Set<ISinkNode<any>> = new Set();
     private readonly _logger: ILogger;
 
-    constructor(conf: NodeConfiguration, logger: any) {
+    constructor(conf: NodeConfiguration, logger: ILogger) {
         this._conf = conf;
         this._logger = logger;
     }

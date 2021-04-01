@@ -66,7 +66,7 @@ export class Record<T> implements IRecord<T> {
     constructor(data: T) {
         this._id = uuidv4();
         this._timestamp = new Date().getTime();
-        this._data = {...data, id: this._id, timestamp: this._timestamp};
+        this._data = {...data };
     }
 
     data(): T {

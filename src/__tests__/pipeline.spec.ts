@@ -1,44 +1,43 @@
 import {expect} from 'chai';
-import * as path from 'path';
-import {IStreamContext, Stream} from "../stream";
-import {StreamConfiguration} from "../../config/webHookConfiguration";
-import {Registry} from "../../../nodes/register";
-import express from "express";
+import {StreamConfiguration} from "../api";
+import {IStreamContext, Stream} from "../lib/stream";
 
-describe('Pipeline', () => {
+describe('Stream', () => {
 
-    it('should load pipeline', () => {
-        const configuration: StreamConfiguration = {
-            name: "github_push_pipeline",
-            nodes: [
+    it('should load stream', () => {
+        const configuration: StreamConfiguration =
+             [
                 {
                     name: "input_push",
+                    type: "github-source",
                     settings: {
                         events: [
                             "push"
                         ],
                         signature: "kdsodznvaz234rn"
                     },
-                    type: "github"
+                    out: ["execute_push"]
                 },
                 {
                     name: "execute_push",
+                    type: "bash-sink",
                     settings: {
                         arguments: [
                             "{{ stringify(options) /}}"
                         ],
                         command: "echo",
                         pwd: "/tmp"
-                    },
-                    type: "bash"
+                    }
                 }
-            ]
-        };
+            ];
 
-        const context: IStreamContext = {logger: console, server: express()};
-        const pipeline = new Stream(configuration, Registry, context)
-            .build();
-        expect(pipeline.name).to.equals('github_push_pipeline');
+        const context: IStreamContext = {
+            name: "",
+            nodes: configuration,
+            logger: console
+            // configuration, Registry,
+        };
+        const pipeline = new Stream(context).build();
         expect(pipeline.nodes).to.have.lengthOf(2);
     });
 });

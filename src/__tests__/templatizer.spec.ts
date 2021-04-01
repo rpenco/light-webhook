@@ -1,24 +1,25 @@
 import {expect} from 'chai';
-import {Templatizer} from "../templatizer";
-import {Record} from "../../record/record";
+import {Templatizer} from "../lib";
+import {AnyRecord} from "../api";
 
 describe('Templatizer', () => {
 
     it('should stringify Record', () => {
-        expect(Templatizer.compile(`{{stringify(options)/}}`, new Record()
-            .setId("1")
-            .setFiles({"myFile": { size: 10}})
-            .setData({hello: "world"})
-            .setHeaders({"content-type": "application/json"})))
-            .to.equal('{"headers":{"content-type":"application/json"},"context":{},"files":{"myFile":{"size":10}},"id":"1","data":{"hello":"world"}}');
+        const record = new AnyRecord({hello: "world"});
+        // .setId("1")
+        // .setFiles({"myFile": { size: 10}})
+        // .setHeaders({"content-type": "application/json"}))
+
+        const output = Templatizer.compile(`{{@stringify(it)/}}`, record.data());
+        expect(output).to.equal('{"params":[{"hello":"world"}]}');
+        // expect()
+            // .to.equal('{"headers":{"content-type":"application/json"},"context":{},"files":{"myFile":{"size":10}},"id":"1","data":{"hello":"world"}}');
+            // .to.equal('{"headers":{"content-type":"application/json"},"context":{},"files":{"myFile":{"size":10}},"id":"1","data":{"hello":"world"}}');
     });
 
     it('should stringify Record item', () => {
-        expect(Templatizer.compile(`{{data.hello}}`, new Record()
-            .setId("1")
-            .setFiles({"myFile": { size: 10}})
-            .setData({hello: "world"})
-            .setHeaders({"content-type": "application/json"})))
-            .to.equal('world');
+
+        const record = new AnyRecord({hello: "world"});
+        expect(Templatizer.compile(`{{it._data.hello}}`, record)).to.equal('world');
     });
 });

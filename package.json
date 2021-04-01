@@ -9,7 +9,7 @@
     "light-webhook": "./dist/bundle.js"
   },
   "scripts": {
-    "test": "mocha -r ts-node/register ./\\*\\*/\\*.spec.ts",
+    "test": "mocha -r ts-node/register 'src/**/*.spec.ts'",
     "build": "webpack",
     "start:dev": "ts-node src/index.ts",
     "release:pack": "npm run build && npm pack",
