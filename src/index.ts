@@ -6,7 +6,6 @@ import {Log} from "./lib/log";
 try {
     const configuration = new Cli().parseArgs().getConfiguration();
     Log.reload(configuration.logger);
-    // Log.debug(`application environment variables:`, process.env);
 
     const wh = new Webhook(configuration);
 

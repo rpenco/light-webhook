@@ -61,7 +61,8 @@ settings:
 
 > A `x-webhook-event: my-event` header must be provided to match with settings events.  
 > if `webhook.signature` setting is provided, a `x-webhook-token: sha1=xxxxxxxxx` header must be provided where `xxxxxxxxx` is the sha1 __cyphered__ secret.   
-> You can generate a signature using [sha1-online.com](http://www.sha1-online.com/)
+> You can generate a signature using [sha1-online.com](http://www.sha1-online.com/)  
+> Alternatively you can define `plain=plain_text_passphrase` for development/debug.
 
 
 **🟧 PROPOSAL |** **Multipart - file upload (optional)**

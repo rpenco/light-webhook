@@ -1,5 +1,5 @@
 import Joi from "joi";
-import {of, Subscriber} from "rxjs";
+import {Observable, of, Subscriber} from "rxjs";
 import {AnyRecord, SourceNode} from "../../api";
 
 export interface Settings{
@@ -92,7 +92,7 @@ export class GithubSource extends SourceNode<Settings> {
      * @param subscriber
      */
 
-    execute(subscriber: Subscriber<AnyRecord>) {
+    execute():Observable<AnyRecord> {
         // TODO create Express server and listen..
 
         this.getLogger().info(`${this.name} execute." name="${this.name}"`);

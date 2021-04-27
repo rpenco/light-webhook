@@ -1,34 +1,34 @@
 # Github source
 
-> NOT IMPLEMENTED YET!  
-> This page is an implementation proposal.
+> 🟡 PARTIAL IMPLEMENTATION    
+> This source has a partial implementation.
 
+## Description
+
+Receive a Http Github request with custom webhook headers to perform any action.
 
 ## Usage
 
 ```yaml
-type: github-source
+type: http-source
 settings:
-  events:
-    - push
-    - merge_request
-  method: post
-  signature: sha1=<secret-signature>
-  headers:
-    xGithubEvent: <key>
-    xGithubSignature: <key>
+    host: 127.0.0.1
+    port: 8080
+    method: post
+    path: /github
+    webhook:
+      events:
+       - push
+       - merge_request
+      signature: sha1=<secret-signature>
+      headers:
+        event: 'x-github-event'
+        token: 'x-github-signature'
 ```
-
 ### Settings
 
-| Settings        | Default  | Description                                                               |
-|-----------------|----------|---------------------------------------------------------------------------|
-| method          | `post`   | Acceptable HTTP method                                                    |
-| events          | `['*']`  | Acceptable Github events. Use `['*']` to allow all events                 |
-| signature       |          | Secret provided by `X-Hub-Signature` header. Or missing to disabled it.   |
-| headers.xGithubEvent     | `x-github-event`  | Key of the received header which contains events        |
-| headers.xGithubSignature | `x-hub-signature` | Key of the received header which contains signature     |
-
+Configure a classic [Http Source](source/http.md) with specific headers `x-github-event` and `x-github-signature`.   
+Read [Http Source](source/http.md) documentation page for more information.
 
 ## Record
 

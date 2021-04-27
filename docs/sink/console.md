@@ -1,6 +1,6 @@
 # Console Sink
 
-> 🟢 STABLE | This sink is globally stable.
+> 🟢 STABLE | This sink is stable.
 
 ## Description
 

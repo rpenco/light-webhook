@@ -1,7 +1,8 @@
 import Joi from "joi";
-import {Subscriber} from "rxjs";
+import {Observable, Subscriber} from "rxjs";
 import {AnyRecord, SinkNode} from "../../api";
 import {SubprocessBuilder, Templatizer} from "../../lib";
+import {fromPromise} from "rxjs/internal/observable/fromPromise";
 
 interface Settings {
     /**
@@ -54,7 +55,7 @@ export class BashSink extends SinkNode<Settings> {
      * @param subscriber
      * @param record
      */
-    execute(subscriber: Subscriber<AnyRecord>, record: AnyRecord): void {
+    execute(record: AnyRecord): Observable<AnyRecord> {
         this.getLogger().info(`${this.name()} receive record id="${record.id()}"`);
 
         this.builder = new SubprocessBuilder()
@@ -69,17 +70,17 @@ export class BashSink extends SinkNode<Settings> {
             this.builder.environments(this.settings().environments.map(env => Templatizer.compile(env, record)))
         }
 
-        this.builder.execute()
+        return fromPromise(this.builder.execute()
             .then(data => {
                     record.setData({...record.data(), stdout: data.stdout, stderr: data.stderr, code: data.code});
-                    subscriber.next(record)
+                    return record
                 },
                 err => {
                     // record.setError(new Error(`Command returns an error status code.`));
                     record.setData({...record.data(), stdout: '', stderr: err, code: 255});
-                    subscriber.error(record);
+                    return record;
                 }
-            )
+            ));
     }
 
 }

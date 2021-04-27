@@ -1,6 +1,6 @@
 # Bash Sink
 
-> 🟢 STABLE | This sink is globally stable.
+> 🟢 STABLE | This sink is stable.
 
 ## Description
 
@@ -14,8 +14,8 @@ settings:
   pwd: /home/me
   command: myscript.sh
   arguments:
-    - "{{ header['x-webhook-event'] /}}"
-    - "{{ body.url }}"
+    - "{{ it.header['x-webhook-event'] /}}"
+    - "{{ it.body.url }}"
   environments:
     - MY_KEY=myvalue
 ```

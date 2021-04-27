@@ -1,36 +1,62 @@
 # HTTP Sink
 
-> NOT IMPLEMENTED YET!  
-> This page is an implementation proposal.
+> 🟡 PARTIAL IMPLEMENTATION    
+> This source has a partial implementation.   
+> Each unavailable feature is indicated as __🟧 PROPOSAL__ or __❌ not available__.
+
 
 ## Usage
 
-Send an HTTP request to an other endpoint. **REWORK IN PROGRESS**
+Send an HTTP request to another endpoint.
 
 ```yaml
 type: http-sink
 settings:
-  method: GET
   url: http://myotherservice.com
-  params:
-    key: value
+  method: GET
   headers:
-    key: value
+    Content-Type: application/json
+    x-custom-header: '{{stringify(it.data.param)}}'
+  body: '{{stringify(it)}}'
+    
 
 ```
 
-## Settings 
+### Settings
 
-| option        | description                       |
-|---------------|-----------------------------------|
-| service       | service used : `http`             |
-| name          | choose an unique service name     |
-| settings      | service configuration             |
-| settings.method  | HTTP method.                   |
-| settings.url  | Remote url to call                |
-| settings.params    | `body` request in case of `post` or `put`.|
-| settings.headers   | request headers.|
-| settings.stringify | If `true`, when you use a variable, if it is an object, it will be serialized. |
+**Server configuration**
+
+| Settings        | Default  | Description                                                               |
+|-----------------|----------|---------------------------------------------------------------------------|
+| url             |          | Remote URL |
+| method          | `post`   | Acceptable HTTP method (`get`, `post`, `put`, `delete`)                   |
+| headers         | `[]`     | Request headers to add                |
+| body            | `{{stringify(it)}}`      | Body template                 |
+
+**🟧 PROPOSAL |** **Authorization (optional)**
+
+| Settings        | Default  | Description                                                               |
+|-----------------|----------|---------------------------------------------------------------------------|
+| authorization.header    | `authorization`   | Header name used for authorization |
+| authorization.secret    |                   | JWT secret to confirm authorization |
+
+
+**🟧 PROPOSAL |** **TLS (optional)**
+
+| Settings        | Default  | Description        |
+|-----------------|----------|--------------------|
+| tls.key         |    | Path to key              |
+| tls.cert        |    | Path to certificate      |
+| tls.passphrase  |    | Password / Passphrase    |
+
+Using OpenSSL, we will generate our key and cert. So, here’s how you could do this:
+
+```sell
+openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365
+```
+
+Test source with curl using https like this `curl -k https://localhost:8080`.
+
 
 ## Record
 
@@ -38,6 +64,6 @@ This node publishes record with this additional fields:
 
 ```json
 {
-  // Http response body
+  "response":  "<Http response body>"
 }
 ```

@@ -1,13 +1,25 @@
 import Joi from "joi";
-import {forkJoin, Observable} from "rxjs";
-import {map} from 'rxjs/operators';
-import {TypeRegistry} from "./register";
-import {INode, INodeContext, IRecord, ISinkNode, ISourceNode, NodeConfiguration, SinkNode, SourceNode} from "../api";
+import {forkJoin, Observable, pipe} from "rxjs";
+import {flatMap, map, mergeAll, multicast} from 'rxjs/operators';
+import {Type, TypeRegistry} from "./register";
+import {
+    INode,
+    INodeContext,
+    IRecord,
+    ISinkNode,
+    ISourceNode,
+    NodeConfiguration,
+    Record,
+    SinkNode,
+    SourceNode
+} from "../api";
 import {FileSource, GeneratorSource, GithubSource, GitlabSource, HttpSource} from "../nodes/sources";
 import {BashSink, ConsoleSink, FileSink, HttpSink, KafkaSink, S3Sink, SyslogSink} from "../nodes/sinks";
 import {Config} from "./config";
 import {Log} from "./log";
 import {ILogger} from "../api/logger";
+import {CST} from "yaml";
+import Map = CST.Map;
 
 
 export interface IStreamContext {
@@ -16,34 +28,37 @@ export interface IStreamContext {
     nodes: NodeConfiguration[];
 }
 
+type SourceObs = { source: ISourceNode<any>, observable: Observable<IRecord<any>> };
+
+
 export class Stream {
     readonly context: IStreamContext;
     nodes = new Map<string, INode<any>>();
     private loopInterval: NodeJS.Timeout;
     registry = new TypeRegistry();
-
+    stream: any[] = [];
     constructor(context: IStreamContext) {
         this.context = context;
     }
 
     register() {
         //register sources
-        this.registry.put('file-source', FileSource);
-        this.registry.put('generator-source', GeneratorSource);
-        this.registry.put('github-source', GithubSource);
-        this.registry.put('gitlab-source', GitlabSource);
-        this.registry.put('http-source', HttpSource);
+        // this.registry.put('file-source', FileSource);
+        this.registry.putSource('generator-source', GeneratorSource);
+        // this.registry.put('github-source', GithubSource);
+        // this.registry.put('gitlab-source', GitlabSource);
+        this.registry.putSource('http-source', HttpSource);
         // this.registry.put('kafka-source', KafkaSource);
         // this.registry.put('syslog-source', SyslogSource);
 
         // register sinks
-        this.registry.put('bash-sink', BashSink);
-        this.registry.put('console-sink', ConsoleSink);
-        this.registry.put('file-sink', FileSink);
-        this.registry.put('http-sink', HttpSink);
-        this.registry.put('kafka-sink', KafkaSink);
-        this.registry.put('s3-sink', S3Sink);
-        this.registry.put('syslog-sink', SyslogSink);
+        // this.registry.put('bash-sink', BashSink);
+        this.registry.putSink('console-sink', ConsoleSink);
+        // this.registry.put('file-sink', FileSink);
+        // this.registry.put('http-sink', HttpSink);
+        // this.registry.put('kafka-sink', KafkaSink);
+        // this.registry.put('s3-sink', S3Sink);
+        // this.registry.put('syslog-sink', SyslogSink);
     }
 
 
@@ -58,45 +73,56 @@ export class Stream {
         this.getLogger().debug("loading graph...");
         this.register()
         this.context.nodes.forEach(nodeConf => {
-            this.getLogger().debug(` - '${nodeConf.name}' loading...`)
-            this.handleLoop(nodeConf);
+            let nClass: any = this.registry.getSource(nodeConf.type);
+            let node;
+            if(nClass){
+                node = new nClass(nodeConf, Log.getLogger().child({node: nodeConf.name}));
+                node.setSettings(Config.validate(node.validate(Joi), node.settings()));
+                this.getLogger().debug(` |_ '${nodeConf.name}' source loaded`)
+                this.nodes.set(node.name(), node);
+            }else{
+                nClass = this.registry.getSink(nodeConf.type);
+                if(nClass){
+                    node = new nClass(nodeConf, Log.getLogger().child({node: nodeConf.name}));
+                    node.setSettings(Config.validate(node.validate(Joi), node.settings()));
+                    this.getLogger().debug(` |_ '${nodeConf.name}' sink loaded`)
+                    this.nodes.set(node.name(), node);
+                }else{
+                    throw Error(`failed to find node of type ${nodeConf.type}`);
+                }
+            }
+        });
+
+        this.getLogger().debug("handle sinks...");
+        this.nodes.forEach(node => {
+            if (node instanceof SourceNode) {
+                this.getLogger().debug(` |_ '${node.name()}' source:`)
+                    this.handleOut(node);
+            }
         });
         this.getLogger().debug("graph successfully loaded");
+
         return this;
     }
 
-    private handleLoop(nodeConf: NodeConfiguration, source?: INode<any>): INode<any> {
-        this.getLogger().debug(`--> next: ${nodeConf.name}`)
+    private handleOut(node: INode<any>): void {
+      if(node.config().out.length > 0){
+            this.getLogger().debug(`  \\_ outs: [${node.config().out}]`);
+            node.config().out.map(out => {
+                const outNode = this.nodes.get(out);
+                if (outNode && outNode instanceof SinkNode) {
+                    this.getLogger().debug(`   |-> out: ${outNode.name()} sink (${node.name()})`)
+                    node.addOut(outNode);
 
-        let node: INode<any> = this.nodes.get(nodeConf.name);
-        if (node === undefined) {
-            const nClass: any = this.registry.get(nodeConf.type);
-            if (nClass === undefined) {
-                throw new Error(`failed to find node type '${nodeConf.type}' for node ${nodeConf.name}. `);
-            }
-            node = new nClass(nodeConf, Log.getLogger().child({ node: nodeConf.name }));
-            node.setSettings(Config.validate(node.validate(Joi), node.settings()));
-
-            this.getLogger().debug(`  |_ '${nodeConf.name}' loaded`)
-            this.nodes.set(node.name(), node);
-        } else {
-            this.getLogger().debug(`node ${nodeConf.name} already loaded`);
-        }
-        if (source) {
-            source.addOut(node as SinkNode<any>);
-        }
-
-        if(nodeConf.out) {
-            nodeConf.out.forEach(outName => {
-                const outConf = this.context.nodes.find(n => n.name == outName);
-                if (outConf != null) {
-                    this.handleLoop(outConf, node)
+                    if(outNode.config().out.length > 0) {
+                        this.getLogger().debug(`  |__ '${outNode.name()}' sink: `)
+                        this.handleOut(outNode);
+                    }
                 } else {
-                    this.getLogger().error(`failed to find out node '${outName}' configured in out section of node ${nodeConf.name}`);
+                    throw Error(`failed to find out node named ${out} for node ${node.name()}`);
                 }
             });
         }
-        return node;
     }
 
 
@@ -113,46 +139,60 @@ export class Stream {
     }
 
 
-    public start(timeout: number): Stream {
-        const sources = [];
+    public hand(source: INode<any>, record: IRecord<any>){
+        source.out().map(out => {
+            let recordCopy = record.copy();
+            recordCopy.pushFlow(out.name(), source.name());
+            const h = out.execute(recordCopy).subscribe(outRecord => {
+                outRecord.pushMetric(out.name())
+                if(h !== undefined){
+                    h.unsubscribe();
+                }
+                this.hand(out, outRecord);
+            });
+        });
+    }
+
+    logOut(node: INode<any>){
+        this.getLogger().info(`${node.name()}:`);
+        node.out().forEach((n: INode<any>)=>{
+            this.getLogger().info(` - out: ${n.name()}`);
+            this.logOut(n);
+        });
+    }
+
+    public start(): Stream {
+
+        const sources: SourceObs[] = [];
+
+        // Init first loop
         this.nodes.forEach(node => {
             if (node instanceof SourceNode) {
-                sources.push(node);
+                sources.push({
+                    source: node,
+                    observable: new Observable<IRecord<any>>(subscriber => node.execute(subscriber))
+                });
+                this.getLogger().info("log out");
+                this.logOut(node);
             }
         });
 
-        // main loop
-        // TODO critical improve this graph to support unsubscribe() and resolve() / reject();
-        this.loopInterval = setInterval(() => {
-            this.getLogger().debug(`\n--- loop start ----`);
-            const t0 = new Date().getTime();
-            sources.forEach((node: ISourceNode<any>) => {
-                this.getLogger().debug(`execute source node: '${node.name()}'`);
-                const t1 = new Date().getTime();
-                const observable = new Observable(subscriber => {
-                    node.execute(subscriber)
-                }).pipe(map((data: IRecord<any>) => {
-                    return this.loop(node, data);
-                }))
-
-                return observable.subscribe((data) => {
-                    this.getLogger().debug(`[${(new Date().getTime() - t1)} ms] execute stream final record`, data);
+        sources.map((source: SourceObs) => {
+            return source.observable.subscribe((record)=>{
+                    record.pushFlow(source.source.name(), 'root');
+                    record.pushMetric(source.source.name());
+                    this.hand(source.source, record);
+                    record.pushMetric('end');
+                    this.getLogger().error(JSON.stringify({
+                        id: record.id(),
+                        flow: record.flow().join('-->'),
+                        duration: (record.metrics()[record.metrics().length-1].timestamp - record.metrics()[0].timestamp)+ "ms",
+                        metrics: record.metrics().map((m, i) => `[${i}] ${m.name} ${m.timestamp}`),
+                        data: JSON.stringify(record.data())
+                    }))
                 });
-            })
-            this.getLogger().debug(`[${(new Date().getTime() - t0)} ms] --- loop end ----`);
-        }, timeout);
+            });
         return this;
-    }
-
-    private loop(node: ISinkNode<any>, data: IRecord<any>) {
-        node.out().forEach(out => {
-            new Observable(subscriber => {
-                out.execute(subscriber, data)
-            }).subscribe((data2: IRecord<any>) => {
-                this.loop(out, data2)
-            })
-        })
-        return data;
     }
 
     /**

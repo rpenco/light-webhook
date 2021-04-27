@@ -23,26 +23,10 @@ export interface LoggerConfiguration {
 }
 
 export interface Configuration {
-    /**
-     * @deprecated
-     */
-    port?: number;
-    /**
-     * @deprecated
-     */
-    hostname?: string;
-    /**
-     * @deprecated
-     */
-    uploadMaxSize?: number;
-    /**
-     * @deprecated
-     */
-    tls?: TLSConfiguration;
+
+    name: string;
 
     logger?: LoggerConfiguration;
 
-    name?: string;
-    interval?: number;
     stream: StreamConfiguration;
 }

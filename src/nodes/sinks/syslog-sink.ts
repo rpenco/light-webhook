@@ -1,7 +1,7 @@
 import Joi from "joi";
 import {Observable, of, Subscriber} from "rxjs";
 import * as winston from "winston";
-import {INodeContext, IRecord, SinkNode} from "../../api";
+import {AnyRecord, INodeContext, IRecord, SinkNode} from "../../api";
 import {Templatizer} from "../../lib";
 
 interface Settings {
@@ -99,7 +99,7 @@ export class SyslogSink extends SinkNode<Settings> {
      * @param conf
      * @param context
      */
-    prepare(context: INodeContext): Observable<IRecord<any>> {
+    prepare(context: INodeContext): Observable<true> {
         const winston = require('winston');
         this.logger = winston.createLogger({
             levels: winston.config.syslog.levels,
@@ -119,10 +119,11 @@ export class SyslogSink extends SinkNode<Settings> {
                 })
             ]
         });
-        return of();
+        return of(true);
     }
 
-    execute(subscriber: Subscriber<IRecord<any>>, record: IRecord<any>) {
-        this.logger.log(this.settings().level, Templatizer.compile(this.settings().message, record));
+    execute(record: AnyRecord):Observable<AnyRecord> {
+        this.logger.log(this.settings().level, Templatizer.compile(this.settings().message, record.data()));
+        return of(record);
     }
 }

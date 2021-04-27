@@ -1,13 +1,33 @@
 name: simple-stream
-interval: 1000
 logger:
     level: info
 stream:
+#    - name: generator
+#      type: generator-source
+#      settings:
+#        message: Hello {{it.id}} {{it.timestamp}} {{it.counter}}
+#        interval: 1000
+#      out:
+#        - console
+#        - console3
+
     -   name: http
         type: http-source
         settings:
             host: 127.0.0.1
             port: 8080
+            method: post
+            path: /publish
+            webhook:
+                events: ['write']
+        out:
+            - http-out
+
+    -   name: http-out
+        type: http-source
+        settings:
+            host: 127.0.0.1
+            port: 8081
             method: post
             path: /publish
             webhook:
@@ -20,6 +40,28 @@ stream:
         settings:
             format: json
             level: info
+            prefix: c1
+            passThrough: false
+
+
+
+#    -   name: console2
+#        type: console-sink
+#        settings:
+#            format: json
+#            level: info
+#            prefix: c2
+#            passThrough: false
+#        out:
+#            - console3
+#
+#    -   name: console3
+#        type: console-sink
+#        settings:
+#            format: json
+#            level: info
+#            prefix: c3
+#            passThrough: false
 
 
 

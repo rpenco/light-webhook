@@ -1,7 +1,8 @@
-import {Subscriber} from "rxjs";
+import {Observable, Subscriber} from "rxjs";
 import {AnyRecord, SinkNode} from "../../api";
 import Joi from "joi";
 import {Templatizer} from "../../lib";
+import {fromPromise} from "rxjs/internal/observable/fromPromise";
 
 const path = require('path');
 const fs = require('fs-extra');
@@ -27,11 +28,11 @@ export class FileSink extends SinkNode<FileProcessorSettings> {
         }).default();
     }
 
-    execute(subscriber: Subscriber<AnyRecord>, record: AnyRecord): void {
+    execute(record: AnyRecord): Observable<AnyRecord> {
         const basePath = Templatizer.compile(this.settings().path, null);
         const input = record.data();
         this.createDirectory(basePath);
-        this.write(path.join(basePath, input.name), input.stream, input.enconding)
+        return fromPromise(this.write(path.join(basePath, input.name), input.stream, input.enconding)
             .then(filePath => {
                 this.chmod(filePath);
                 this.chown(filePath);
@@ -39,8 +40,8 @@ export class FileSink extends SinkNode<FileProcessorSettings> {
             })
             .then((filePath) => {
                 record.setData(filePath)
-                subscriber.next(record);
-            });
+                return record;
+            }));
     }
 
     private createDirectory(basePath: string): void {

@@ -1,6 +1,6 @@
 import {v4 as uuidv4} from 'uuid';
 
-export interface IRecord<T> {
+export interface IRecord<Row> {
     /**
      * Get record id (uuid v4) ⇨ '1b9d6bcd-bbfd-4b2d-9b5d-ab8dfbbd4bed'
      */
@@ -14,65 +14,109 @@ export interface IRecord<T> {
     /**
      * Get data enriched/modified during stream
      */
-    data(): T;
-
+    data(): Row;
 
     /**
      * Update data during stream
      * @param data
      */
-    setData(data: T): void;
+    setData(data: Row): void;
+
+    flow(): string[];
+
+    pushFlow(name: string, source:string): void;
+
+    metrics(): Metric[];
+
+    pushMetric(name: string): void;
 
     // setHeaders(headers: { [k: string]: string }): IRecord<T>;
-
     // getHeaders(): { [k: string]: string };
-
     // getHeader(key: string): string;
-
     // setContext(ctx: { [k: string]: any }): IRecord<T>;
-
     // addContext(key: string, ctx: any): IRecord<T>;
-
     // getContext(): { [k: string]: string };
-
     // setId(id: string): IRecord<T>;
-
-
-
     // setError(error: Error): IRecord<T>;
-
     // getError(): Error;
-
     // setFiles(files: { [k: string]: any }): IRecord<T>;
-
     // getFiles(): { [k: string]: any };
-
     // setCurrentFile(file: any): IRecord<T>;
-
     // getCurrentFile(): any;
+    copy(): IRecord<any>;
+}
+class Metric{
+    name: string;
+    timestamp: number = new Date().getTime();
+    constructor(name: string) {
+        this.name = name;
+    }
 }
 
-export class Record<T> implements IRecord<T> {
-    private _id: string;
-    private _data: T;
-    private _timestamp: number;
-    private _error: Error;
+export class Record<Row> implements IRecord<Row> {
+    _id: string;
+    _data: Row;
+    _timestamp: number;
+    _error: Error;
+    _flow: string[];
+    _metrics: Metric[] = [];
+
+    constructor(data: Row) {
+        this._id = uuidv4();
+        this._timestamp = new Date().getTime();
+        this._data = {...data };
+        this._flow = [];
+        this._metrics.push(new Metric('root'));
+    }
+
+    id(): string {
+        return this._id;
+    }
+
+    timestamp(): number {
+        return this._timestamp;
+    }
+
+    data(): Row {
+        return this._data;
+    }
+
+    setData(data: Row): void {
+        this._data = data;
+    }
+
+
+    flow(): string[] {
+        return this._flow;
+    }
+
+    pushFlow(name: string, source:string): void {
+        this._flow.push(`[${name}:${source}]`);
+    }
+
+    metrics(): Metric[] {
+        return this._metrics;
+    }
+
+    pushMetric(name: string): void {
+        this._metrics.push(new Metric(name));
+    }
+
+    copy(): IRecord<any> {
+        let record = new Record(this.data());
+        record._id = this.id()+'-copy';
+        record._flow = this.flow();
+        record._error = this._error;
+        record._metrics = this.metrics();
+        record._timestamp = this.timestamp();
+        return record;
+    }
+
 
     // private headers: { [k: string]: string } = {};
     // private context: { [k: string]: string } = {};
     // private files: { [k: string]: string } = {};
     // private file: {};
-
-    constructor(data: T) {
-        this._id = uuidv4();
-        this._timestamp = new Date().getTime();
-        this._data = {...data };
-    }
-
-    data(): T {
-        return this._data;
-    }
-
     // getHeaders(): { [k: string]: string } {
     //     return this.headers;
     // }
@@ -88,9 +132,7 @@ export class Record<T> implements IRecord<T> {
     //     return this;
     // }
 
-    setData(data: T): void {
-        this._data = data;
-    }
+
 
     // setHeaders(headers: { [k: string]: string }): IRecord<T> {
     //     this.headers = headers;
@@ -102,13 +144,7 @@ export class Record<T> implements IRecord<T> {
     //     return this;
     // }
 
-    id(): string {
-        return this._id;
-    }
 
-    timestamp(): number {
-        return this._timestamp;
-    }
 
     // getHeader(key: string): string {
     //     return this.headers[key];
@@ -128,7 +164,7 @@ export class Record<T> implements IRecord<T> {
     //     return this;
     // }
 
-    // setFiles(files: { [k: string]: any }): IRecord<T> {
+    // setFiles(files: { [k: string]: any }): IRecord<Row> {
     //     this.files = files;
     //     return this;
     // }

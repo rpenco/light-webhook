@@ -104,7 +104,7 @@ export class S3Sink extends SinkNode<Settings> {
      * @param conf
      * @param context
      */
-    prepare(context: INodeContext): Observable<AnyRecord> {
+    prepare(context: INodeContext): Observable<boolean> {
 
         const options = {
             endPoint: this.settings().endPoint,
@@ -117,7 +117,7 @@ export class S3Sink extends SinkNode<Settings> {
         };
         this.minioClient = new Minio.Client(options);
         this.getLogger().debug(`prepare ${this.name} node. Prepare minio client..`);
-        return of();
+        return of(true);
     }
 
     /**
@@ -126,7 +126,7 @@ export class S3Sink extends SinkNode<Settings> {
      * @param subscriber
      * @param record in this case is previous node
      */
-    execute(subscriber: Subscriber<AnyRecord>, record: AnyRecord): Observable<AnyRecord> {
+    execute(record: AnyRecord): Observable<AnyRecord> {
         this.getLogger().info(`${this.name} receive record id="${record.id()}"`);
 
         const bucketName = Templatizer.compile(this.settings().bucketName, record);

@@ -32,7 +32,7 @@ export class Webhook {
         return this.stream
             .prepare()
             .pipe(map(() => {
-                return this.stream.start(this.configuration.interval);
+                return this.stream.start();
             }));
     }
 

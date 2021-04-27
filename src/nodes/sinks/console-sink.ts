@@ -1,5 +1,5 @@
 import Joi from "joi";
-import {Subscriber} from "rxjs";
+import {Observable, of, Subscriber} from "rxjs";
 import {AnyRecord, SinkNode} from "../../api";
 
 /**
@@ -23,7 +23,9 @@ export class ConsoleSink extends SinkNode<Settings> {
         }).default();
     }
 
-    execute(subscriber: Subscriber<AnyRecord>, record: AnyRecord): void {
+    execute(record: AnyRecord): Observable<AnyRecord> {
+        this.getLogger().debug(`id: ${record.id()} flow: ${record.flow().join('-->')} `)//data: ${JSON.stringify(recordCopy.data())}
+
         let log;
         switch (this.settings().format) {
             case "json":
@@ -45,7 +47,7 @@ export class ConsoleSink extends SinkNode<Settings> {
             record.setData({...record.data(), console: log})
         }
 
-        subscriber.next(record);
+        return of(record);
     }
 
     getAsJson(record: AnyRecord, pretty?: boolean): string {

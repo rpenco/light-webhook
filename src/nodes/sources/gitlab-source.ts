@@ -1,5 +1,5 @@
 import Joi from "joi";
-import {of, Subscriber} from "rxjs";
+import {Observable, of, Subscriber} from "rxjs";
 import {AnyRecord, SourceNode} from "../../api";
 
 interface GitlabSettings {
@@ -84,7 +84,7 @@ export class GitlabSource extends SourceNode<GitlabSettings> {
         }).default();
     }
 
-    execute(subscriber: Subscriber<AnyRecord>) {
+    execute():Observable<AnyRecord> {
         // TODO create Express server and listen..
         let req;
         this.getLogger().info(`${this.name} receive record id="${req.getId()}"`);

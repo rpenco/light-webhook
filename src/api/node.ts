@@ -1,6 +1,6 @@
 import {Observable, of, Subscriber} from "rxjs";
 import Joi from "joi";
-import {IRecord, Record} from "./record";
+import {IRecord} from "./record";
 import {NodeConfiguration} from "./configuration";
 import {ILogger} from "./logger";
 
@@ -22,22 +22,26 @@ export interface INode<Settings> {
 
     type(): string;
 
+    config(): NodeConfiguration;
+
     settings(): Settings;
 
     setSettings(settings: Settings): void;
 
-    getLogger(): any;
+    getLogger(): ILogger;
 
-    out(): Set<ISinkNode<any>>;
+    out<Row>():ISinkNode<Row>[];
 
-    addOut(node: ISinkNode<any>): void;
+    addOut<Row>(node: ISinkNode<Row>): void;
+
+    setOut<Row>(nodes: ISinkNode<Row>[]): void;
 
     /**
      * Prepare listen node
      * @param conf the configuration for this node
      * @param context
      */
-    prepare(context: INodeContext): Observable<IRecord<any>>;
+    prepare(context: INodeContext): Observable<boolean>;
 
     /**
      * Validate configuration
@@ -54,21 +58,20 @@ export interface INode<Settings> {
 
     /**
      * Called when pipeline succeed
-     * @param lastStream
+     * @param record
      */
-    resolve<A, B>(lastStream: IRecord<A>): Observable<IRecord<B>>;
+    resolve<Row>(record: IRecord<Row>): Observable<IRecord<Row>>;
 
     /**
      * Called when pipeline failed
-     * @param lastStream
+     * @param record
      */
-    reject<A, B>(lastStream: IRecord<A>): Observable<IRecord<B>>;
+    reject<Row>(record: IRecord<Row>): Observable<IRecord<Row>>;
 }
 
 export abstract class Node<Settings> implements INode<Settings> {
     private readonly _conf: NodeConfiguration;
-    private _subscriber: any;
-    private _outNodes: Set<ISinkNode<any>> = new Set();
+    private _outNodes: ISinkNode<any>[] = [];
     private readonly _logger: ILogger;
 
     constructor(conf: NodeConfiguration, logger: ILogger) {
@@ -77,23 +80,23 @@ export abstract class Node<Settings> implements INode<Settings> {
     }
 
     close(): Observable<void> {
-        this.getLogger().debug(`[${this.name()}]#close() - nothing to do. return non breaking observable..`);
+        this.getLogger().debug(`close - return void`);
         return of();
     }
 
-    prepare(context: INodeContext): Observable<IRecord<any>> {
-        this.getLogger().debug(`[${this.name()}]#prepare() - nothing to do. return non breaking observable..`);
-        return of(new Record(null));
+    prepare(context: INodeContext): Observable<boolean> {
+        this.getLogger().debug(`prepare - return true`);
+        return of(true);
     }
 
-    reject<A, B>(lastStream: IRecord<A>): Observable<IRecord<B>> {
-        this.getLogger().debug(`[${this.name()}]#reject() - nothing to do. return non breaking observable..`);
-        return of();
+    reject<Row>(record: IRecord<Row>): Observable<IRecord<Row>> {
+        this.getLogger().debug(`reject - return received record`);
+        return of(record);
     }
 
-    resolve<A, B>(lastStream: IRecord<A>): Observable<IRecord<B>> {
-        this.getLogger().debug(`[${this.name()}]#resolve() - nothing to do. return non breaking observable..`);
-        return of();
+    resolve<Row>(record: IRecord<Row>): Observable<IRecord<Row>> {
+        this.getLogger().debug(`resolve - return received record`);
+        return of(record);
     }
 
     abstract validate(Joi): Joi.Schema;
@@ -106,6 +109,10 @@ export abstract class Node<Settings> implements INode<Settings> {
         return this._conf.type;
     }
 
+    config(): NodeConfiguration {
+        return this._conf;
+    }
+
     settings(): Settings {
         return this._conf.settings as Settings;
     }
@@ -114,12 +121,16 @@ export abstract class Node<Settings> implements INode<Settings> {
         this._conf.settings = setting;
     }
 
-    out(): Set<ISinkNode<any>> {
+    out(): ISinkNode<any>[] {
         return this._outNodes;
     }
 
     addOut(node: ISinkNode<any>): void {
-        this._outNodes.add(node);
+        this._outNodes.push(node);
+    }
+
+    setOut(nodes: ISinkNode<any>[]): void {
+        this._outNodes = nodes;
     }
 
     getLogger(): ILogger {
@@ -129,20 +140,22 @@ export abstract class Node<Settings> implements INode<Settings> {
 
 
 /*
-* ISOURCENODE
+* ISOURCE NODE
 * */
 
 export interface ISourceNode<Setting> extends INode<Setting> {
-    execute(subscriber: Subscriber<IRecord<any>>);
+    // execute<Row>(): Observable<IRecord<Row>>;
+    execute<Row>(subscriber: Subscriber<IRecord<Row>>): void;
 }
 
 export abstract class SourceNode<Settings> extends Node<Settings> implements ISourceNode<Settings> {
-    abstract execute(subscriber: Subscriber<IRecord<any>>);
+    // abstract execute<Row>(): Observable<IRecord<Row>>;
+    execute<Row>(subscriber: Subscriber<IRecord<Row>>): void {};
 }
 
 
 /*
-* ISINKNODE
+* ISINK NODE
 * */
 
 export interface ISinkNode<Setting> extends INode<Setting> {
@@ -152,9 +165,9 @@ export interface ISinkNode<Setting> extends INode<Setting> {
      * @param subscriber
      * @param record
      */
-    execute(subscriber: Subscriber<IRecord<any>>, record: IRecord<any>): void;
+    execute<Row>(record: IRecord<Row>): Observable<IRecord<Row>>;
 }
 
 export abstract class SinkNode<S> extends Node<S> implements ISinkNode<S> {
-    abstract execute(subscriber: Subscriber<IRecord<any>>, record: IRecord<any>): void;
+    abstract execute<Row>(record: IRecord<any>): Observable<IRecord<Row>>;
 }

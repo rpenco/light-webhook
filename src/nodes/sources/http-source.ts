@@ -4,11 +4,9 @@ import * as os from "os";
 
 import Joi from "joi";
 import {Observable, of, Subscriber} from "rxjs";
-import {CST} from "yaml";
-import {AnyRecord, INodeContext, Record, SourceNode} from "../../api";
+import {AnyRecord, INodeContext, IRecord, Record, SourceNode} from "../../api";
 import * as http from "http";
 import express, {Express} from "express";
-import {VoidRecord} from "../../api/record";
 
 export interface HttpSourceSettings {
 
@@ -133,17 +131,9 @@ interface MultipartSettings{
  *  2/ Then call automatically HttpInputNode.resolve() or HttpInputNode.fail() to returns response to client.
  */
 export class HttpSource extends SourceNode<HttpSourceSettings> {
-
-    // TODO WORK IN PROGRESS. SOURCE NOT WORK. ANY CONTRIBUTION IS WELCOME
-
-
-    /**
-     * Node can receives many request at same time.
-     * During dealing with them,
-     */
-    private requestsHandler: any[] = [];
     private app: Express;
     private server: http.Server;
+    private subscriber: Subscriber<IRecord<any>>;
 
     /**
      * Static settings validation at startup
@@ -207,7 +197,7 @@ export class HttpSource extends SourceNode<HttpSourceSettings> {
      * @param conf
      * @param context
      */
-    prepare(context: INodeContext): Observable<VoidRecord> {
+    prepare(context: INodeContext): Observable<boolean> {
         this.getLogger().info(`prepare server host: "${this.settings().host}", port: "${this.settings().port}"`);
 
         this.app = express();
@@ -240,13 +230,21 @@ export class HttpSource extends SourceNode<HttpSourceSettings> {
                 return;
             }
 
-            this.requestsHandler.push(req);
+            if(this.subscriber) {
+                this.subscriber.next(new Record({
+                    url: req.url,
+                    method: req.method,
+                    headers: req.headers,
+                    body: req.body
+                }));
+            }
+
             res.json({
                 "status": 200
             });
         })
 
-        return of(new VoidRecord());
+        return of(true);
     }
 
 
@@ -255,17 +253,9 @@ export class HttpSource extends SourceNode<HttpSourceSettings> {
      * Check headers and pass record to next node.
      * @param subscriber
      */
-    execute(subscriber: Subscriber<AnyRecord>) {
-        this.getLogger().debug(`execute requests: ${this.requestsHandler.length}`);
-        if(this.requestsHandler.length > 0){
-            const req = this.requestsHandler.shift();
-            subscriber.next(new Record({
-                url: req.url,
-                method: req.method,
-                headers: req.headers,
-                body: req.body
-            }));
-        }
+    execute(subscriber: Subscriber<AnyRecord>): void {
+        this.getLogger().debug(`ready to receive requests`);
+        this.subscriber = subscriber;
     }
 
 
@@ -273,6 +263,7 @@ export class HttpSource extends SourceNode<HttpSourceSettings> {
     close(): Observable<void> {
         this.getLogger().info(`close server host: "${this.settings().host}", port: "${this.settings().port}"`);
         this.server.close();
+        this.subscriber.unsubscribe();
         return of();
     }
 
@@ -282,11 +273,11 @@ export class HttpSource extends SourceNode<HttpSourceSettings> {
      * @param record is the record that contains transformed data during pipeline until it fails and the error.
      */
     public reject(record: AnyRecord): Observable<AnyRecord> {
-        // this.getLogger().error(`${this.name} pipeline failed id="${record.id()}" error="${record.getError().message}"`);
+        this.getLogger().error(`stream failed id="${record.id()}"`);
         // return this.requestsHandler.get(record.getId())
         //     .status(500)
         //     .json({error: record.getError().message})
-        return of();
+        return of(record);
     }
 
     /**
@@ -299,7 +290,7 @@ export class HttpSource extends SourceNode<HttpSourceSettings> {
         // return this.requestsHandler.get(record.getId())
         //     .status(200)
         //     .json(record.getData())
-        return of();
+        return of(record);
     }
 
     /**

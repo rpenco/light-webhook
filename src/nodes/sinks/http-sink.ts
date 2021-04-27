@@ -1,7 +1,10 @@
 import Joi from "joi";
-import {Subscriber} from "rxjs";
+import {Observable} from "rxjs";
 import * as superagent from "superagent";
 import {AnyRecord, SinkNode} from "../../api";
+import {fromPromise} from "rxjs/internal/observable/fromPromise";
+import {Templatizer} from "../../lib";
+import {SuperAgentRequest} from "superagent";
 
 interface Settings {
     /**
@@ -15,15 +18,9 @@ interface Settings {
     headers: { [key: string]: string };
 
     /**
-     * Hosts to connect
+     * Url
      */
-    hosts: string[];
-
-    /**
-     * Choose if request must be performed to all hosts (if missing or if value == hosts.length) or
-     * if only 'N' will be sufficient. Can be used to load/balancing or to forward requests to many hosts at same times.
-     */
-    atLeast: number;
+    url: string;
 
     /**
      * Request signature. Commonly is formatted like that:
@@ -42,6 +39,11 @@ interface Settings {
      * form the received signature and will be compared.
      */
     signature: string;
+
+    /**
+     * Body template
+     */
+    body: string;
 }
 
 /**
@@ -50,19 +52,12 @@ interface Settings {
  */
 export class HttpSink extends SinkNode<Settings> {
 
-    // TODO WORK IN PROGRESS. SINK NOT WORK. ANY CONTRIBUTION IS WELCOME
-
-    /**
-     * Static settings validation at startup
-     * @param Joi
-     */
     public validate(Joi): Joi.Schema {
         return Joi.object({
-            headers: Joi.array().default([]),
+            url: Joi.sting().required(),
             method: Joi.string().default('post'),
-            hosts: Joi.array().default([]),
-            signature: Joi.string(),
-            atLeast: Joi.number().default(Joi.ref('hosts').length),
+            headers: Joi.array().default([]),
+            body: Joi.string().default("{{stringify(it)}}"),
         }).default();
     }
 
@@ -70,39 +65,35 @@ export class HttpSink extends SinkNode<Settings> {
     /**
      * Called each time a new request arrived.
      * Check headers and pass record to next node.
-     * @param subscriber
      * @param record
      */
-
-    execute(subscriber: Subscriber<AnyRecord>, record: AnyRecord) {
+    execute(record: AnyRecord):Observable<AnyRecord> {
         this.getLogger().info(`${this.name} receive record id="${record.id()}"`);
-        let promises = [];
-        for (const host of this.settings().hosts) {
-            let request;
 
-            if (this.settings().method === 'post') {
-                request = superagent.post(`${host}`);
-            } else if (this.settings().method === 'get') {
-                request = superagent.post(`${host}`);
-            } else if (this.settings().method === 'delete') {
-                request = superagent.delete(`${host}`);
-            } else if (this.settings().method === 'put') {
-                request = superagent.put(`${host}`);
-            } else {
-                throw new Error('Invalid method for HTTP request.');
-            }
+        let request:SuperAgentRequest;
 
-            for (const header of Object.keys(this.settings().headers)) {
-                request.set(this.settings().headers[header], header)
-            }
-
-            request
-                .set('Content-Type', 'application/json')
-                .send(record);
-            promises.push(request);
+        if (this.settings().method === 'post') {
+            request = superagent.post(`${this.settings().url}`);
+        } else if (this.settings().method === 'get') {
+            request = superagent.post(`${this.settings().url}`);
+        } else if (this.settings().method === 'delete') {
+            request = superagent.delete(`${this.settings().url}`);
+        } else if (this.settings().method === 'put') {
+            request = superagent.put(`${this.settings().url}`);
+        } else {
+            throw new Error('Invalid method for HTTP request.');
         }
-        // TODO enrich with reply, statuscode..
-        Promise.all(promises).then(() => subscriber.next(record));
+
+        for (const header of Object.keys(this.settings().headers)) {
+            request.set(
+                Templatizer.compile(this.settings().headers[header], {...record.data()}),
+                Templatizer.compile(header, {...record.data()}))
+        }
+
+        return fromPromise(request.send(Templatizer.compile(this.settings().body, {...record.data()})).then(value => {
+            record.setData({...record.data(), response: value})
+            return record;
+        }));
     }
 
 }
